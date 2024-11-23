@@ -8,7 +8,7 @@ import icon1 from '../assets/images/icon_1.png'
 import icon2 from '../assets/images/icon_2.png'
 import icon3 from '../assets/images/icon_3.png'
 
-interface ProductContent {
+interface GameContent {
   title: string
   mainDescription: string
   secondaryDescription: string
@@ -17,7 +17,10 @@ interface ProductContent {
 }
 
 function GameEditor() {
-  const [content, setContent] = useState<ProductContent>({
+  // API base URL
+	const API_URL = 'http://localhost:3000/api/games';
+  const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
+  const [content, setContent] = useState<GameContent>({
     title: 'Koi-Koi',
     mainDescription: 'Koi-Koi is a traditional Japanese card game played with Hanafuda cards, often enjoyed by two players. The goal is to create specific card combinations, called yaku, to earn points. The game consists of rounds where players alternately draw cards to match ones on the table, forming sets based on seasonal themes.',
     secondaryDescription: 'A player can declare "Koi-Koi" to extend the round for a chance at higher scores, but it risks their opponent earning more points. It\'s a strategic blend of matching, timing, and calculated risks, celebrated for its cultural significance and aesthetic beauty.',
