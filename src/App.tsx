@@ -1,12 +1,12 @@
 import './App.css'
 import { Gallery } from '@/components/Gallery'
-import { GameEditor } from '@/components/GameEditor'
+import { Game } from '@/components/Game'
 
 function App() {
 
   return (
     <div className="flex flex-col gap-4">
-      <GameEditor />
+      <Game />
       <Gallery />
     </div>
   )
