@@ -2,7 +2,8 @@ import { useState, useCallback, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Upload, Trash } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card"
+import { Upload, Trash, GripVertical } from 'lucide-react'
 import axios from 'axios'
 
 // Define interfaces for type safety
@@ -18,7 +19,13 @@ interface GameContent {
   image_3: File | null
 }
 
-function Game() {
+// Add Props interface
+interface GameProps {
+  label: string;
+}
+
+// Update function signature
+function Game({ label }: GameProps) {
   // API base URL
   const API_URL = 'http://localhost:3000/api/games';
   const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
@@ -27,7 +34,6 @@ function Game() {
   const [icon1, setIcon1] = useState<string>('');
   const [icon2, setIcon2] = useState<string>('');
   const [icon3, setIcon3] = useState<string>('');
-  const [label, setLabel] = useState<string>('game1');
   const [name, setName] = useState<string>('');
   const [description1, setDescription1] = useState<string>('');
   const [description2, setDescription2] = useState<string>('');
@@ -121,7 +127,7 @@ function Game() {
         const icon3Blob = DataURIToBlob(icon3);
         formData.append('image_3', icon3Blob);
       }
-      
+
       await axios.put(`${API_URL}?q=${label}`, formData, {
         headers: {
           'Authorization': `Bearer ${AUTH_TOKEN}`,
@@ -135,106 +141,107 @@ function Game() {
   }
 
   return (
-<div className="min-h-screen p-8 bg-amber-50">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-4">
-          <Input
-            value={label}
-            onChange={(e) => setLabel(e.target.value)}
-            className="w-[480px] text-lg font-semibold text-amber-800 bg-amber-50 border-amber-200"
-            placeholder="Enter label"
-          />
-          <div className="flex space-x-2">
-          <Button className="bg-amber-600 text-white hover:bg-amber-700" onClick={handleSubmit}>
-            Submit
-          </Button>
-          <Button className="bg-red-600 text-white hover:bg-red-700">
-            <Trash className="w-4 h-4 mr-2" />
-              Delete
-            </Button>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-12 items-start">
-          <div className="space-y-4">
-            <div
-              className="relative w-[480px] h-[480px] rounded-2xl overflow-hidden bg-white shadow-lg border-2 border-amber-200"
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => handleDrop(e, 'mainImage')}
-            >
-              <img
-                src={mainImage}
-                alt="Product"
-                className="object-contain p-0"
-                sizes="480px"
-              />
-              <label
-                htmlFor="mainImage"
-                className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
-              >
-                <Upload className="w-8 h-8 text-white" />
-              </label>
-              <Input
-                type="file"
-                id="mainImage"
-                accept="image/*"
-                onChange={(e) => handleFileUpload(e.target.files?.[0] as File, 'mainImage')}
-                className="hidden"
-              />
+    <div className="min-h-screen w-4/6 mx-auto bg-white p-8">
+      <div className="bg-amber-50 p-6 rounded-xl">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex justify-between items-center mb-4">
+            <Input
+              value={label}
+              readOnly
+              className="w-[480px] text-lg font-semibold text-amber-800 bg-amber-50 border-amber-200"
+            />
+            <div className="flex space-x-2">
+              <Button className="bg-amber-600 text-white hover:bg-amber-700" onClick={handleSubmit}>
+                Submit
+              </Button>
+              <Button className="bg-red-600 text-white hover:bg-red-700">
+                <Trash className="w-4 h-4 mr-2" />
+                Delete
+              </Button>
             </div>
           </div>
 
-          <div className="space-y-8">
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="text-4xl font-bold mb-4 text-amber-800 bg-amber-50 border-amber-200"
-              placeholder="Enter title"
-            />
-
-            <Textarea
-              value={description1}
-              onChange={(e) => setDescription1(e.target.value)}
-              className="min-h-[100px] mb-4 text-amber-700 bg-amber-50 border-amber-200"
-              placeholder="Enter main description"
-            />
-
-            <Textarea
-              value={description2}
-              onChange={(e) => setDescription2(e.target.value)}
-              className="min-h-[100px] mb-8 text-amber-700 bg-amber-50 border-amber-200"
-              placeholder="Enter secondary description"
-            />
-
-            <div className="flex justify-between">
-              {[icon1, icon2, icon3].map((icon, index) => (
-                <div
-                  key={index}
-                  className="relative w-[112px] h-[112px] rounded-2xl overflow-hidden shadow-md border-2 border-amber-200 bg-white"
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={(e) => handleDrop(e, 'icons', index)}
+          <div className="grid md:grid-cols-2 gap-12 items-start">
+            <div className="space-y-4">
+              <div
+                className="relative w-[480px] h-[480px] rounded-2xl overflow-hidden bg-white shadow-lg border-2 border-amber-200"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => handleDrop(e, 'mainImage')}
+              >
+                <img
+                  src={mainImage}
+                  alt="Product"
+                  className="object-contain p-0"
+                  sizes="480px"
+                />
+                <label
+                  htmlFor="mainImage"
+                  className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
                 >
-                  <img
-                    src={icon}
-                    alt={`Icon ${index + 1}`}
-                    className="object-cover p-2"
-                    sizes="112px"
-                  />
-                  <label
-                    htmlFor={`icon-${index + 1}`}
-                    className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
+                  <Upload className="w-8 h-8 text-white" />
+                </label>
+                <Input
+                  type="file"
+                  id="mainImage"
+                  accept="image/*"
+                  onChange={(e) => handleFileUpload(e.target.files?.[0] as File, 'mainImage')}
+                  className="hidden"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-8">
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="text-4xl font-bold mb-4 text-amber-800 bg-amber-50 border-amber-200"
+                placeholder="Enter title"
+              />
+
+              <Textarea
+                value={description1}
+                onChange={(e) => setDescription1(e.target.value)}
+                className="min-h-[100px] mb-4 text-amber-700 bg-amber-50 border-amber-200"
+                placeholder="Enter main description"
+              />
+
+              <Textarea
+                value={description2}
+                onChange={(e) => setDescription2(e.target.value)}
+                className="min-h-[100px] mb-8 text-amber-700 bg-amber-50 border-amber-200"
+                placeholder="Enter secondary description"
+              />
+
+              <div className="flex justify-between">
+                {[icon1, icon2, icon3].map((icon, index) => (
+                  <div
+                    key={index}
+                    className="relative w-[112px] h-[112px] rounded-2xl overflow-hidden shadow-md border-2 border-amber-200 bg-white"
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => handleDrop(e, 'icons', index)}
                   >
-                    <Upload className="w-6 h-6 text-white" />
-                  </label>
-                  <Input
-                    type="file"
-                    id={`icon-${index + 1}`}
-                    accept="image/*"
-                    onChange={(e) => handleFileUpload(e.target.files?.[0] as File, 'icons', index)}
-                    className="hidden"
-                  />
-                </div>
-              ))}
+                    <img
+                      src={icon}
+                      alt={`Icon ${index + 1}`}
+                      className="object-cover p-2"
+                      sizes="112px"
+                    />
+                    <label
+                      htmlFor={`icon-${index + 1}`}
+                      className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
+                    >
+                      <Upload className="w-6 h-6 text-white" />
+                    </label>
+                    <Input
+                      type="file"
+                      id={`icon-${index + 1}`}
+                      accept="image/*"
+                      onChange={(e) => handleFileUpload(e.target.files?.[0] as File, 'icons', index)}
+                      className="hidden"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
