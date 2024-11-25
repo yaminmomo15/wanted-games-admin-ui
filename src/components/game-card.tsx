@@ -10,7 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { Plus, Send, ArrowUpDown, Trash2, ImageIcon } from 'lucide-react'
+import { Send, ArrowUpDown, Trash2, ImageIcon, Pencil } from 'lucide-react'
 
 interface GameCardProps {
   id: string
@@ -38,7 +38,9 @@ function GameCard({
   const [description2, setDescription2] = useState(defaultDescription2)
   const [mainImage, setMainImage] = useState<string>(defaultImage)
   const [smallImages, setSmallImages] = useState<string[]>(defaultSmallImages)
-  const [isEditing, setIsEditing] = useState(false)
+  const [isEditingTitle, setIsEditingTitle] = useState(false)
+  const [isEditingDesc1, setIsEditingDesc1] = useState(false)
+  const [isEditingDesc2, setIsEditingDesc2] = useState(false)
 
   const { getRootProps: getMainProps, getInputProps: getMainInput } = useDropzone({
     accept: {
@@ -61,7 +63,9 @@ function GameCard({
 
   const handleSubmit = () => {
     console.log({ title, description1, description2, mainImage, smallImages })
-    setIsEditing(false)
+    setIsEditingTitle(false)
+    setIsEditingDesc1(false)
+    setIsEditingDesc2(false)
   }
 
   const smallImageDropzone0 = useDropzone({
@@ -106,37 +110,58 @@ function GameCard({
 
           {/* Content Section */}
           <div className="space-y-4">
-            {isEditing ? (
-              <>
-                <Input
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Enter title"
-                  className="text-2xl font-bold"
-                />
-                <Textarea
-                  value={description1}
-                  onChange={(e) => setDescription1(e.target.value)}
-                  placeholder="Enter first description"
-                  className="min-h-[100px]"
-                />
-                <Textarea
-                  value={description2}
-                  onChange={(e) => setDescription2(e.target.value)}
-                  placeholder="Enter second description"
-                  className="min-h-[100px]"
-                />
-              </>
+            {isEditingTitle ? (
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Enter title"
+                className="text-2xl font-bold"
+                onBlur={() => setIsEditingTitle(false)}
+                autoFocus
+              />
             ) : (
-              <>
-                <h2 className="text-2xl font-bold">{title || "Game Title"}</h2>
-                <p className="text-gray-600">
-                  {description1 || "First description goes here"}
-                </p>
-                <p className="text-gray-600">
-                  {description2 || "Second description goes here"}
-                </p>
-              </>
+              <h2 
+                className="text-2xl font-bold cursor-pointer hover:bg-gray-100 p-1 rounded"
+                onClick={() => setIsEditingTitle(true)}
+              >
+                {title || "Game Title"}
+              </h2>
+            )}
+
+            {isEditingDesc1 ? (
+              <Textarea
+                value={description1}
+                onChange={(e) => setDescription1(e.target.value)}
+                placeholder="Enter first description"
+                className="min-h-[100px]"
+                onBlur={() => setIsEditingDesc1(false)}
+                autoFocus
+              />
+            ) : (
+              <p 
+                className="text-gray-600 cursor-pointer hover:bg-gray-100 p-1 rounded"
+                onClick={() => setIsEditingDesc1(true)}
+              >
+                {description1 || "First description goes here"}
+              </p>
+            )}
+
+            {isEditingDesc2 ? (
+              <Textarea
+                value={description2}
+                onChange={(e) => setDescription2(e.target.value)}
+                placeholder="Enter second description"
+                className="min-h-[100px]"
+                onBlur={() => setIsEditingDesc2(false)}
+                autoFocus
+              />
+            ) : (
+              <p 
+                className="text-gray-600 cursor-pointer hover:bg-gray-100 p-1 rounded"
+                onClick={() => setIsEditingDesc2(true)}
+              >
+                {description2 || "Second description goes here"}
+              </p>
             )}
 
             {/* Small Images Section */}
@@ -171,13 +196,17 @@ function GameCard({
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => setIsEditing(true)}
+                  onClick={() => {
+                    setIsEditingTitle(true)
+                    setIsEditingDesc1(true)
+                    setIsEditingDesc2(true)
+                  }}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Pencil className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Create new</p>
+                <p>Edit</p>
               </TooltipContent>
             </Tooltip>
 

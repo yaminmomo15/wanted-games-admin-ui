@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { GameCard } from "@/components/game-card"
 import { ReorderModal } from "@/components/reorder-modal"
+import { AddGameButton } from "./add-game-button"
 
 interface GameCardData {
   id: string
@@ -75,6 +76,7 @@ function GamePage() {
         cards={cards.map(card => ({ id: card.id, title: card.title }))}
         onSave={handleSaveReorder}
       />
+	  <AddGameButton />
     </div>
   )
 }
