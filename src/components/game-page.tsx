@@ -6,8 +6,7 @@ import axios from 'axios'
 
 interface GameData {
   id: string | number;
-  label: string;
-  name: string;
+  title: string;
   description_1: string;
   description_2: string;
   image_main: string | null;
@@ -29,15 +28,11 @@ function GamePage() {
 
   const fetchAllGames = async () => {
     try {
-      const response = await axios.get<GameData[]>(API_URL, {
-        headers: {
-          'Authorization': `Bearer ${AUTH_TOKEN}`
-        }
-      });
+      const response = await axios.get<GameData[]>(API_URL);
       
-      // Sort games by label
+      // Sort games by title
       const sortedGames = response.data.sort((a, b) => 
-        a.label.localeCompare(b.label)
+        a.title.localeCompare(b.title)
       );
       
       setGames(sortedGames);
