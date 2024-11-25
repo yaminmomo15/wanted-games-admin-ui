@@ -1,13 +1,11 @@
 import './App.css'
-import { Gallery } from '@/components/Gallery'
-import { AllGames } from './components/AllGames'
+import { GamePage } from './components/game-page'
 
 function App() {
 
   return (
     <div className="flex flex-col gap-4">
-      <AllGames />
-      <Gallery />
+      <GamePage />
     </div>
   )
 }
