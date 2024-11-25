@@ -1,49 +1,62 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { GameCard } from "@/components/game-card"
 import { ReorderModal } from "@/components/reorder-modal"
 import { AddGameButton } from "./add-game-button"
+import axios from 'axios'
 
-interface GameCardData {
-  id: string
-  title: string
-  description1: string
-  description2: string
-  image: string
-  smallImages: string[]
+interface GameData {
+  id: string | number;
+  label: string;
+  name: string;
+  description_1: string;
+  description_2: string;
+  image_main: string | null;
+  image_1: string | null;
+  image_2: string | null;
+  image_3: string | null;
 }
 
 function GamePage() {
-  const [cards, setCards] = useState<GameCardData[]>([
-    {
-      id: "1",
-      title: "Koi-Koi",
-      description1: "Koi-Koi is a traditional Japanese card game played with hanafuda cards, often accompanied by fine artwork.",
-      description2: "The game is typically played between two players. The game consists of rounds, where players alternate taking cards to match ones on the table, forming sets based on seasonal themes.",
-      image: "/placeholder.svg?height=400&width=400",
-      smallImages: [
-        "/placeholder.svg?height=100&width=100",
-        "/placeholder.svg?height=100&width=100",
-        "/placeholder.svg?height=100&width=100"
-      ]
-    },
-    {
-      id: "2",
-      title: "Goblins vs Gnomes",
-      description1: "Goblins vs Gnomes is a fast-paced, tactical board game where players control wacky goblin and gnome factions vying for dominance.",
-      description2: "Each turn involves deploying units, gathering resources, and using unique abilities to outwit opponents.",
-      image: "/placeholder.svg?height=400&width=400",
-      smallImages: [
-        "/placeholder.svg?height=100&width=100",
-        "/placeholder.svg?height=100&width=100",
-        "/placeholder.svg?height=100&width=100"
-      ]
+  const [games, setGames] = useState<GameData[]>([]);
+  const [isReorderModalOpen, setIsReorderModalOpen] = useState(false);
+  
+  const API_URL = 'http://localhost:3000/api/games';
+  const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
+
+  useEffect(() => {
+    fetchAllGames();
+  }, []);
+
+  const fetchAllGames = async () => {
+    try {
+      const response = await axios.get<GameData[]>(API_URL, {
+        headers: {
+          'Authorization': `Bearer ${AUTH_TOKEN}`
+        }
+      });
+      
+      // Sort games by label
+      const sortedGames = response.data.sort((a, b) => 
+        a.label.localeCompare(b.label)
+      );
+      
+      setGames(sortedGames);
+    } catch (error) {
+      console.error('Error fetching games:', error);
     }
-  ])
+  };
 
-  const [isReorderModalOpen, setIsReorderModalOpen] = useState(false)
-
-  const handleDelete = (id: string) => {
-    setCards(cards.filter(card => card.id !== id))
+  const handleDelete = async (id: string) => {
+    try {
+      await axios.delete(`${API_URL}/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${AUTH_TOKEN}`
+        }
+      });
+      await fetchAllGames(); // Refresh the list after deletion
+    } catch (error) {
+      console.error('Error deleting game:', error);
+    }
   }
 
   const handleReorder = () => {
@@ -51,21 +64,26 @@ function GamePage() {
   }
 
   const handleSaveReorder = (newOrder: string[]) => {
-    const reorderedCards = newOrder.map(id => cards.find(card => card.id === id)!)
-    setCards(reorderedCards)
+    const reorderedGames = newOrder.map(id => games.find(game => game.id.toString() === id)!)
+    setGames(reorderedGames)
   }
 
   return (
     <div className="container mx-auto p-4 space-y-8">
-      {cards.map((card) => (
+      {games.map((game) => (
         <GameCard
-          key={card.id}
-          id={card.id}
-          defaultTitle={card.title}
-          defaultDescription1={card.description1}
-          defaultDescription2={card.description2}
-          defaultImage={card.image}
-          defaultSmallImages={card.smallImages}
+          key={game.id}
+          id={game.id.toString()}
+          defaultTitle={game.name}
+          defaultDescription1={game.description_1}
+          defaultDescription2={game.description_2}
+          defaultImage={game.image_main ? `data:image/png;base64,${game.image_main}` : ''}
+          defaultSmallImages={[
+            game.image_1 ? `data:image/png;base64,${game.image_1}` : '',
+            game.image_2 ? `data:image/png;base64,${game.image_2}` : '',
+            game.image_3 ? `data:image/png;base64,${game.image_3}` : ''
+          ]}
+          label={game.label}
           onDelete={handleDelete}
           onReorder={handleReorder}
         />
@@ -73,10 +91,10 @@ function GamePage() {
       <ReorderModal
         isOpen={isReorderModalOpen}
         onClose={() => setIsReorderModalOpen(false)}
-        cards={cards.map(card => ({ id: card.id, title: card.title }))}
+        cards={games.map(game => ({ id: game.id.toString(), title: game.name }))}
         onSave={handleSaveReorder}
       />
-	  <AddGameButton />
+      <AddGameButton />
     </div>
   )
 }

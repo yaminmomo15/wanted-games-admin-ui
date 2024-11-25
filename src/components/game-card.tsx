@@ -1,4 +1,4 @@
-import { useState, useRef } from "react"
+import { useState} from "react"
 import { useDropzone } from "react-dropzone"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -11,9 +11,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { Send, ArrowUpDown, Trash2, ImageIcon, Pencil } from 'lucide-react'
+import axios from 'axios'
 
 interface GameCardProps {
   id: string
+  label: string
   defaultTitle?: string
   defaultDescription1?: string
   defaultDescription2?: string
@@ -25,6 +27,7 @@ interface GameCardProps {
 
 function GameCard({
   id,
+  label,
   defaultTitle = "",
   defaultDescription1 = "",
   defaultDescription2 = "",
@@ -61,11 +64,43 @@ function GameCard({
     setSmallImages(newSmallImages)
   }
 
-  const handleSubmit = () => {
-    console.log({ title, description1, description2, mainImage, smallImages })
-    setIsEditingTitle(false)
-    setIsEditingDesc1(false)
-    setIsEditingDesc2(false)
+  const handleSubmit = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('label', label);
+      formData.append('name', title);
+      formData.append('description_1', description1);
+      formData.append('description_2', description2);
+
+      if (mainImage && !mainImage.startsWith('data:image/png;base64,')) {
+        const mainImageBlob = await fetch(mainImage).then(r => r.blob());
+        formData.append('image_main', mainImageBlob);
+      }
+
+      for (let i = 0; i < smallImages.length; i++) {
+        if (smallImages[i] && !smallImages[i].startsWith('data:image/png;base64,')) {
+          const smallImageBlob = await fetch(smallImages[i]).then(r => r.blob());
+          formData.append(`image_${i + 1}`, smallImageBlob);
+        }
+      }
+
+      const API_URL = 'http://localhost:3000/api/games';
+      const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
+
+      await axios.put(`${API_URL}?q=${label}`, formData, {
+        headers: {
+          'Authorization': `Bearer ${AUTH_TOKEN}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      console.log('Game updated successfully');
+      setIsEditingTitle(false);
+      setIsEditingDesc1(false);
+      setIsEditingDesc2(false);
+    } catch (error) {
+      console.error('Error submitting game:', error);
+    }
   }
 
   const smallImageDropzone0 = useDropzone({
