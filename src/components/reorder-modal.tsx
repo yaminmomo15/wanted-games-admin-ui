@@ -1,6 +1,4 @@
-"use client"
-
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Sortable from 'sortablejs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -15,25 +13,35 @@ interface ReorderModalProps {
 
 function ReorderModal({ isOpen, onClose, cards, onSave }: ReorderModalProps) {
   const listRef = useRef<HTMLUListElement>(null)
+  const sortableRef = useRef<Sortable | null>(null)
+  const [tempCards, setTempCards] = useState(cards)
 
   useEffect(() => {
-    let sortable: Sortable | null = null;
+    setTempCards(cards)
+  }, [cards])
+
+  useEffect(() => {
     if (listRef.current && isOpen) {
-      sortable = new Sortable(listRef.current, {
+      sortableRef.current = new Sortable(listRef.current, {
         animation: 150,
         handle: ".handle",
         onEnd: (evt) => {
-          const itemEl = evt.item as HTMLElement;
-          console.log("Moved element:", itemEl.id);
+          const cardsArray = [...tempCards]
+          const movedItem = cardsArray[evt.oldIndex!]
+          cardsArray.splice(evt.oldIndex!, 1)
+          cardsArray.splice(evt.newIndex!, 0, movedItem)
+          setTempCards(cardsArray)
         }
       })
     }
+
     return () => {
-      if (sortable) {
-        sortable.destroy()
+      if (sortableRef.current) {
+        sortableRef.current.destroy()
+        sortableRef.current = null
       }
     }
-  }, [isOpen, cards])
+  }, [isOpen, tempCards])
 
   const handleSave = () => {
     if (listRef.current) {
