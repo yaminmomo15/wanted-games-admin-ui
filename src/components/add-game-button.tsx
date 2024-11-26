@@ -7,7 +7,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-function AddGameButton() {
+interface AddGameButtonProps {
+  onAddGame: () => void;
+}
+
+function AddGameButton({ onAddGame }: AddGameButtonProps) {
   return (
     <div className="w-full max-w-4xl mx-auto mb-6">
       <TooltipProvider>
@@ -16,6 +20,7 @@ function AddGameButton() {
             <Button
               variant="outline"
               className="w-full h-10"
+              onClick={onAddGame}
             >
               <Plus className="h-4 w-4" />
             </Button>

@@ -13,9 +13,19 @@ import {
 import { Send, ArrowUpDown, Trash2, ImageIcon, Pencil } from 'lucide-react'
 import axios from 'axios'
 
+interface GameData {
+  id: string
+  title: string
+  description_1: string
+  description_2: string
+  image_main: string
+  image_1?: string
+  image_2?: string
+  image_3?: string
+}
+
 interface GameCardProps {
   id: string
-  label: string
   defaultTitle?: string
   defaultDescription1?: string
   defaultDescription2?: string
@@ -23,27 +33,35 @@ interface GameCardProps {
   defaultSmallImages?: string[]
   onDelete: (id: string) => void
   onReorder: () => void
+  onGameCreated?: (gameData: GameData) => void
+  isNewGame?: boolean
 }
 
 function GameCard({
   id,
-  label,
-  defaultTitle = "",
-  defaultDescription1 = "",
-  defaultDescription2 = "",
-  defaultImage = "",
+  defaultTitle = "New Game Title",
+  defaultDescription1 = "Enter first description here...",
+  defaultDescription2 = "Enter second description here...",
+  defaultImage = "/placeholder.svg",
   defaultSmallImages = [],
   onDelete,
-  onReorder
+  onReorder,
+  onGameCreated,
+  isNewGame = false
 }: GameCardProps) {
   const [title, setTitle] = useState(defaultTitle)
   const [description1, setDescription1] = useState(defaultDescription1)
   const [description2, setDescription2] = useState(defaultDescription2)
   const [mainImage, setMainImage] = useState<string>(defaultImage)
-  const [smallImages, setSmallImages] = useState<string[]>(defaultSmallImages)
+  const [smallImages, setSmallImages] = useState<string[]>(
+    defaultSmallImages.length > 0 
+      ? defaultSmallImages 
+      : Array(3).fill('/placeholder.svg')
+  )
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [isEditingDesc1, setIsEditingDesc1] = useState(false)
   const [isEditingDesc2, setIsEditingDesc2] = useState(false)
+  const [isNew, setIsNew] = useState(isNewGame)
 
   const { getRootProps: getMainProps, getInputProps: getMainInput } = useDropzone({
     accept: {
@@ -67,37 +85,52 @@ function GameCard({
   const handleSubmit = async () => {
     try {
       const formData = new FormData();
-      formData.append('label', label);
-      formData.append('name', title);
-      formData.append('description_1', description1);
-      formData.append('description_2', description2);
+      formData.append('title', title.trim() || 'New Game Title');
+      formData.append('description_1', description1.trim() || 'Enter first description here...');
+      formData.append('description_2', description2.trim() || 'Enter second description here...');
 
-      if (mainImage && !mainImage.startsWith('data:image/png;base64,')) {
-        const mainImageBlob = await fetch(mainImage).then(r => r.blob());
-        formData.append('image_main', mainImageBlob);
-      }
-
-      for (let i = 0; i < smallImages.length; i++) {
-        if (smallImages[i] && !smallImages[i].startsWith('data:image/png;base64,')) {
-          const smallImageBlob = await fetch(smallImages[i]).then(r => r.blob());
-          formData.append(`image_${i + 1}`, smallImageBlob);
+      if (mainImage && mainImage !== '/placeholder.svg') {
+        if (mainImage.startsWith('data:image/png;base64,')) {
+          formData.append('image_main', mainImage);
+        } else {
+          const mainImageBlob = await fetch(mainImage).then(r => r.blob());
+          formData.append('image_main', mainImageBlob);
         }
       }
 
-      const API_URL = 'http://localhost:3000/api/games';
+      for (let i = 0; i < smallImages.length; i++) {
+        if (smallImages[i] && smallImages[i] !== '/placeholder.svg') {
+          if (smallImages[i].startsWith('data:image/png;base64,')) {
+            formData.append(`image_${i + 1}`, smallImages[i]);
+          } else {
+            const smallImageBlob = await fetch(smallImages[i]).then(r => r.blob());
+            formData.append(`image_${i + 1}`, smallImageBlob);
+          }
+        }
+      }
+
+      const API_URL = import.meta.env.VITE_API_URL + '/games';
       const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
 
-      await axios.put(`${API_URL}?q=${label}`, formData, {
+      const response = await axios({
+        method: isNew ? 'post' : 'put',
+        url: isNew ? API_URL : `${API_URL}/${id}`,
+        data: formData,
         headers: {
           'Authorization': `Bearer ${AUTH_TOKEN}`,
           'Content-Type': 'multipart/form-data'
         }
       });
 
-      console.log('Game updated successfully');
+      console.log(`Game ${isNew ? 'created' : 'updated'} successfully`);
       setIsEditingTitle(false);
       setIsEditingDesc1(false);
       setIsEditingDesc2(false);
+
+      if (isNew && response.data && onGameCreated) {
+        onGameCreated(response.data);
+        setIsNew(false);
+      }
     } catch (error) {
       console.error('Error submitting game:', error);
     }
