@@ -14,6 +14,8 @@ interface GameData {
   image_1: string | null;
   image_2: string | null;
   image_3: string | null;
+  background_color: string;
+  text_color: string;
 }
 
 interface NewGameData {
@@ -24,6 +26,8 @@ interface NewGameData {
   image_1: string | null;
   image_2: string | null;
   image_3: string | null;
+  background_color: string;
+  text_color: string;
 }
 
 const API_URL = import.meta.env.VITE_API_URL + '/games';
@@ -34,7 +38,6 @@ function GamePage() {
   const [isReorderModalOpen, setIsReorderModalOpen] = useState(false);
   const submitRef = useRef<(() => void) | null>(null);
   
-  // games.map(game => console.log(`game id${game.id}, ${game.sort_id}`))
   const fetchAllGames = async () => {
     try {
       const response = await axios.get<GameData[]>(API_URL);
@@ -114,13 +117,17 @@ function GamePage() {
     description1: string,
     description2: string,
     mainImage: string,
-    smallImages: string[]
+    smallImages: string[],
+    backgroundColor: string,
+    textColor: string
   }) => {
     try {
       const formData = new FormData();
       formData.append('title', gameData.title);
       formData.append('description_1', gameData.description1);
       formData.append('description_2', gameData.description2);
+      formData.append('background_color', gameData.backgroundColor);
+      formData.append('text_color', gameData.textColor);
 
       if (gameData.mainImage && gameData.mainImage !== '/placeholder.svg') {
         if (gameData.mainImage.startsWith('data:image/png;base64,')) {
@@ -171,7 +178,7 @@ function GamePage() {
       console.log(`Game updated successfully`);
     } catch (error) {
       console.error('Error submitting game:', error);
-      throw error; // Re-throw to let GameCard handle the error state
+      throw error;
     }
   }
 
@@ -196,6 +203,8 @@ function GamePage() {
             game.image_2 ? `data:image/png;base64,${game.image_2}` : '/placeholder.svg',
             game.image_3 ? `data:image/png;base64,${game.image_3}` : '/placeholder.svg'
           ]}
+          defaultBackgroundColor={game.background_color}
+          defaultTextColor={game.text_color}
           onDelete={handleDelete}
           onReorder={handleReorder}
           onSubmit={handleSubmit}

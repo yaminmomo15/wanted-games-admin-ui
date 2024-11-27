@@ -15,8 +15,6 @@ function ReorderModal({ isOpen, onClose, cards, onSave }: ReorderModalProps) {
   const listRef = useRef<HTMLUListElement>(null)
   const sortableRef = useRef<Sortable | null>(null)
   
-  console.log('Cards received:', cards)
-  
   const [tempCards, setTempCards] = useState(cards)
 
   useEffect(() => {

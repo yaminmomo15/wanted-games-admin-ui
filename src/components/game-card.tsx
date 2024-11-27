@@ -4,6 +4,13 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { HexColorPicker, HexColorInput } from "react-colorful"
+import { Label } from "@/components/ui/label"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import {
   Tooltip,
   TooltipContent,
@@ -40,6 +47,8 @@ interface GameCardProps {
     description2: string,
     mainImage: string,
     smallImages: string[]
+    backgroundColor: string,
+    textColor: string
   }) => Promise<void>
   submitRef: React.MutableRefObject<(() => void) | null>
 }
@@ -52,6 +61,8 @@ const GameCard = ({
   defaultDescription2 = "Enter second description here...",
   defaultImage = "/placeholder.svg",
   defaultSmallImages = [],
+  defaultBackgroundColor = "#ffffff",
+  defaultTextColor = "#000000",
   onDelete,
   onReorder,
   onSubmit,
@@ -69,7 +80,9 @@ const GameCard = ({
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [isEditingDesc1, setIsEditingDesc1] = useState(false)
   const [isEditingDesc2, setIsEditingDesc2] = useState(false)
-
+  const [backgroundColor, setBackgroundColor] = useState(defaultBackgroundColor)
+  const [textColor, setTextColor] = useState(defaultTextColor)
+  
   const { getRootProps: getMainProps, getInputProps: getMainInput } = useDropzone({
     accept: {
       "image/*": []
@@ -97,7 +110,9 @@ const GameCard = ({
         description1: description1.trim() || 'Enter first description here...',
         description2: description2.trim() || 'Enter second description here...',
         mainImage,
-        smallImages
+        smallImages,
+        backgroundColor,
+        textColor
       });
 
       setIsEditingTitle(false);
@@ -228,6 +243,64 @@ const GameCard = ({
           </div>
         </div>
 
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mt-6 space-y-4 sm:space-y-0">
+        <div className="flex flex-col sm:flex-row items-start sm:items-end space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+            <div>
+              <Label htmlFor="bg-color" className="mb-1 block">Background</Label>
+              <div className="flex items-center space-x-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      id="bg-color"
+                      variant="outline"
+                      className="w-[42px] h-[42px] p-0"
+                      style={{ backgroundColor }}
+                    >
+                      <span className="sr-only">Pick a background color</span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <HexColorPicker color={backgroundColor} onChange={setBackgroundColor} />
+                  </PopoverContent>
+                </Popover>
+                <HexColorInput
+                  color={backgroundColor}
+                  onChange={setBackgroundColor}
+                  prefixed
+                  alpha
+                  className="w-[100px] h-[42px] px-2 border rounded"
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="text-color" className="mb-1 block">Text</Label>
+              <div className="flex items-center space-x-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      id="text-color"
+                      variant="outline"
+                      className="w-[42px] h-[42px] p-0"
+                      style={{ backgroundColor: textColor }}
+                    >
+                      <span className="sr-only">Pick a text color</span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <HexColorPicker color={textColor} onChange={setTextColor} />
+                  </PopoverContent>
+                </Popover>
+                <HexColorInput
+                  color={textColor}
+                  onChange={setTextColor}
+                  prefixed
+                  alpha
+                  className="w-[100px] h-[42px] px-2 border rounded"
+                />
+              </div>
+            </div>
+          </div>
+
         {/* Action Buttons */}
         <div className="flex justify-end gap-2 mt-6">
           <TooltipProvider>
@@ -295,6 +368,7 @@ const GameCard = ({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+        </div>
         </div>
       </CardContent>
     </Card>
