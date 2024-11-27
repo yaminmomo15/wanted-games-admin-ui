@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import Sortable from 'sortablejs'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { GripVertical } from 'lucide-react'
 
@@ -63,7 +63,10 @@ function ReorderModal({ isOpen, onClose, cards, onSave }: ReorderModalProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Reorder Cards</DialogTitle>
+          <DialogTitle>Reorder Games</DialogTitle>
+          <DialogDescription>
+            Drag and drop games to reorder them. Click save when you're done.
+          </DialogDescription>
         </DialogHeader>
         <ul ref={listRef} className="my-6 space-y-2">
           {tempCards.map((card) => (
@@ -74,7 +77,6 @@ function ReorderModal({ isOpen, onClose, cards, onSave }: ReorderModalProps) {
             >
               <GripVertical className="handle mr-2 h-5 w-5 text-gray-500 cursor-grab" />
               <span className="flex-grow">{card.title}</span>
-              <span className="text-sm text-gray-500">({card.sort_id})</span>
             </li>
           ))}
         </ul>

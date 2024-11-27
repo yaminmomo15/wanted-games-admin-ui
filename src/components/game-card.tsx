@@ -17,7 +17,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { Send, ArrowUpDown, Trash2, ImageIcon, Pencil } from 'lucide-react'
+import { Send, ArrowUpDown, Trash2, ImageIcon, Pencil, Check } from 'lucide-react'
 // interface GameData {
 //   id: string
 //   sort_id: number
@@ -38,6 +38,8 @@ interface GameCardProps {
   defaultDescription2?: string
   defaultImage?: string
   defaultSmallImages?: string[]
+  defaultBackgroundColor?: string
+  defaultTextColor?: string
   onDelete: (id: string) => void
   onReorder: () => void
   onSubmit: (data: {
@@ -82,6 +84,7 @@ const GameCard = ({
   const [isEditingDesc2, setIsEditingDesc2] = useState(false)
   const [backgroundColor, setBackgroundColor] = useState(defaultBackgroundColor)
   const [textColor, setTextColor] = useState(defaultTextColor)
+  const [isSubmitted, setIsSubmitted] = useState(false)
   
   const { getRootProps: getMainProps, getInputProps: getMainInput } = useDropzone({
     accept: {
@@ -114,6 +117,14 @@ const GameCard = ({
         backgroundColor,
         textColor
       });
+
+      // Show tick icon
+      setIsSubmitted(true)
+      
+      // Reset after 1 second
+      setTimeout(() => {
+        setIsSubmitted(false)
+      }, 1500)
 
       setIsEditingTitle(false);
       setIsEditingDesc1(false);
@@ -330,7 +341,11 @@ const GameCard = ({
                   size="icon"
                   onClick={() => submitRef.current?.()}
                 >
-                  <Send className="h-4 w-4" />
+                  {isSubmitted ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
