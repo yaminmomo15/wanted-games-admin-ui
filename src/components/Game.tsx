@@ -2,9 +2,9 @@ import { useState, useCallback, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card"
-import { Upload, Trash, GripVertical } from 'lucide-react'
+import { Upload, Trash } from 'lucide-react'
 import axios from 'axios'
+import { DataURIToBlob } from '@/lib/utils'
 
 // Define interfaces for type safety
 interface GameContent {
@@ -50,7 +50,6 @@ function Game({ label }: GameProps) {
           'Authorization': `Bearer ${AUTH_TOKEN}`
         }
       })
-      console.log(response.data);
       setName(response.data.name);
       setDescription1(response.data.description_1);
       setDescription2(response.data.description_2);
@@ -87,18 +86,6 @@ function Game({ label }: GameProps) {
       }
       reader.readAsDataURL(file)
     }
-  }
-
-  function DataURIToBlob(dataURI: string) {
-    const splitDataURI = dataURI.split(',')
-    const byteString = splitDataURI[0].indexOf('base64') >= 0 ? atob(splitDataURI[1]) : decodeURI(splitDataURI[1])
-    const mimeString = splitDataURI[0].split(':')[1].split(';')[0]
-
-    const ia = new Uint8Array(byteString.length)
-    for (let i = 0; i < byteString.length; i++)
-      ia[i] = byteString.charCodeAt(i)
-
-    return new Blob([ia], { type: mimeString })
   }
 
   const handleSubmit = async () => {

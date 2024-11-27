@@ -1,4 +1,4 @@
-import { useState} from "react"
+import { useState } from "react"
 import { useDropzone } from "react-dropzone"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -11,21 +11,21 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { Send, ArrowUpDown, Trash2, ImageIcon, Pencil } from 'lucide-react'
-import axios from 'axios'
-
-interface GameData {
-  id: string
-  title: string
-  description_1: string
-  description_2: string
-  image_main: string
-  image_1?: string
-  image_2?: string
-  image_3?: string
-}
+// interface GameData {
+//   id: string
+//   sort_id: number
+//   title: string
+//   description_1: string
+//   description_2: string
+//   image_main: string
+//   image_1?: string
+//   image_2?: string
+//   image_3?: string
+// }
 
 interface GameCardProps {
   id: string
+  sortId: number
   defaultTitle?: string
   defaultDescription1?: string
   defaultDescription2?: string
@@ -33,12 +33,20 @@ interface GameCardProps {
   defaultSmallImages?: string[]
   onDelete: (id: string) => void
   onReorder: () => void
-  onGameCreated?: (gameData: GameData) => void
-  isNewGame?: boolean
+  onSubmit: (data: {
+    id: string
+    title: string,
+    description1: string,
+    description2: string,
+    mainImage: string,
+    smallImages: string[]
+  }) => Promise<void>
+  submitRef: React.MutableRefObject<(() => void) | null>
 }
 
-function GameCard({
+const GameCard = ({ 
   id,
+  // sortId,
   defaultTitle = "New Game Title",
   defaultDescription1 = "Enter first description here...",
   defaultDescription2 = "Enter second description here...",
@@ -46,9 +54,9 @@ function GameCard({
   defaultSmallImages = [],
   onDelete,
   onReorder,
-  onGameCreated,
-  isNewGame = false
-}: GameCardProps) {
+  onSubmit,
+  submitRef
+}: GameCardProps) => {
   const [title, setTitle] = useState(defaultTitle)
   const [description1, setDescription1] = useState(defaultDescription1)
   const [description2, setDescription2] = useState(defaultDescription2)
@@ -61,7 +69,6 @@ function GameCard({
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [isEditingDesc1, setIsEditingDesc1] = useState(false)
   const [isEditingDesc2, setIsEditingDesc2] = useState(false)
-  const [isNew, setIsNew] = useState(isNewGame)
 
   const { getRootProps: getMainProps, getInputProps: getMainInput } = useDropzone({
     accept: {
@@ -82,55 +89,20 @@ function GameCard({
     setSmallImages(newSmallImages)
   }
 
-  const handleSubmit = async () => {
+  submitRef.current = async () => {
     try {
-      const formData = new FormData();
-      formData.append('title', title.trim() || 'New Game Title');
-      formData.append('description_1', description1.trim() || 'Enter first description here...');
-      formData.append('description_2', description2.trim() || 'Enter second description here...');
-
-      if (mainImage && mainImage !== '/placeholder.svg') {
-        if (mainImage.startsWith('data:image/png;base64,')) {
-          formData.append('image_main', mainImage);
-        } else {
-          const mainImageBlob = await fetch(mainImage).then(r => r.blob());
-          formData.append('image_main', mainImageBlob);
-        }
-      }
-
-      for (let i = 0; i < smallImages.length; i++) {
-        if (smallImages[i] && smallImages[i] !== '/placeholder.svg') {
-          if (smallImages[i].startsWith('data:image/png;base64,')) {
-            formData.append(`image_${i + 1}`, smallImages[i]);
-          } else {
-            const smallImageBlob = await fetch(smallImages[i]).then(r => r.blob());
-            formData.append(`image_${i + 1}`, smallImageBlob);
-          }
-        }
-      }
-
-      const API_URL = import.meta.env.VITE_API_URL + '/games';
-      const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
-
-      const response = await axios({
-        method: isNew ? 'post' : 'put',
-        url: isNew ? API_URL : `${API_URL}/${id}`,
-        data: formData,
-        headers: {
-          'Authorization': `Bearer ${AUTH_TOKEN}`,
-          'Content-Type': 'multipart/form-data'
-        }
+      await onSubmit({
+        id,
+        title: title.trim() || 'New Game Title',
+        description1: description1.trim() || 'Enter first description here...',
+        description2: description2.trim() || 'Enter second description here...',
+        mainImage,
+        smallImages
       });
 
-      console.log(`Game ${isNew ? 'created' : 'updated'} successfully`);
       setIsEditingTitle(false);
       setIsEditingDesc1(false);
       setIsEditingDesc2(false);
-
-      if (isNew && response.data && onGameCreated) {
-        onGameCreated(response.data);
-        setIsNew(false);
-      }
     } catch (error) {
       console.error('Error submitting game:', error);
     }
@@ -283,7 +255,7 @@ function GameCard({
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={handleSubmit}
+                  onClick={() => submitRef.current?.()}
                 >
                   <Send className="h-4 w-4" />
                 </Button>
@@ -330,3 +302,4 @@ function GameCard({
 }
 
 export { GameCard }
+export type { GameCardProps }
