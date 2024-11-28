@@ -35,10 +35,10 @@ function App() {
             }>
               Gallery
             </NavLink>
-            <NavLink to="/about" className={({ isActive }) => 
+            <NavLink to="/contact" className={({ isActive }) => 
               `px-3 py-2 rounded-md ${isActive ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700'}`
             }>
-              About
+              Contact
             </NavLink>
             <NavLink to="/social" className={({ isActive }) => 
               `px-3 py-2 rounded-md ${isActive ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700'}`
