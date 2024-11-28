@@ -6,6 +6,7 @@ import { AboutPage } from './components/pages/about'
 import { GalleryPage } from './components/pages/gallery'
 import { ContactPage } from './components/pages/contact'
 import { SocialPage } from './components/pages/social'
+import { PhonePage } from './components/pages/phone'
 
 function App() {
   return (
@@ -39,10 +40,10 @@ function App() {
             }>
               Social
             </NavLink>
-            <NavLink to="/contact" className={({ isActive }) => 
+            <NavLink to="/phone" className={({ isActive }) => 
               `px-3 py-2 rounded-md ${isActive ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700'}`
             }>
-              Contact
+              Phone
             </NavLink>
           </div>
         </nav>
@@ -56,6 +57,7 @@ function App() {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/social" element={<SocialPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/phone" element={<PhonePage />} />
           </Routes>
         </div>
       </div>
