@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react"
-import { GameCard } from "@/components/game-card"
+import { GameCard } from "@/components/cards/game"
 import { ReorderModal } from "@/components/reorder-modal"
-import { AddGameButton } from "./add-game-button"
+import { AddButton } from "../add-button"
 import axios from 'axios'
 import { DataURIToBlob } from '@/lib/utils'
 interface GameData {
@@ -216,7 +216,7 @@ function GamePage() {
         cards={games.map(game => ({ id: game.id.toString(), sort_id: game.sort_id, title: game.title,  }))}
         onSave={handleSaveReorder}
       />
-      <AddGameButton onAddGame={handleAddGame} />
+      <AddButton onAdd={handleAddGame} label="Add New Game" />
     </div>
   )
 }
