@@ -20,6 +20,11 @@ function App() {
             }>
               Home
             </NavLink>
+            <NavLink to="/about" className={({ isActive }) => 
+              `px-3 py-2 rounded-md ${isActive ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700'}`
+            }>
+              About
+            </NavLink>
             <NavLink to="/game" className={({ isActive }) => 
               `px-3 py-2 rounded-md ${isActive ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700'}`
             }>

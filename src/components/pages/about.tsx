@@ -1,8 +1,182 @@
-export function AboutPage() {
+import { useState, useEffect, useRef } from "react"
+import { AboutCard } from "@/components/cards/about"
+import { ReorderModal } from "@/components/reorder-modal"
+import { AddButton } from "../add-button"
+import axios from 'axios'
+import { DataURIToBlob } from '@/lib/utils'
+
+interface AboutData {
+  id: string | number
+  sort_id: number
+  title: string
+  paragraph_1: string
+  paragraph_2: string
+  paragraph_3: string
+  image: string | null
+}
+
+const API_URL = import.meta.env.VITE_API_URL + '/about'
+const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN
+
+function AboutPage() {
+  const [aboutSections, setAboutSections] = useState<AboutData[]>([])
+  const [isReorderModalOpen, setIsReorderModalOpen] = useState(false)
+  const submitRef = useRef<(() => void) | null>(null)
+
+  const fetchAllSections = async () => {
+    try {
+      const response = await axios.get<AboutData[]>(API_URL)
+      setAboutSections(response.data)
+    } catch (error) {
+      console.error('Error fetching about sections:', error)
+    }
+  }
+
+  useEffect(() => {
+    fetchAllSections()
+  }, [])
+
+  const handleDelete = async (id: string) => {
+    try {
+      await axios.delete(`${API_URL}/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${AUTH_TOKEN}`
+        }
+      })
+      await fetchAllSections()
+    } catch (error) {
+      console.error('Error deleting about section:', error)
+    }
+  }
+
+  const handleReorder = () => {
+    setIsReorderModalOpen(true)
+  }
+
+  const handleSaveReorder = async (newOrder: string[]) => {
+    try {
+      const reorderData = newOrder.map((id, index) => ({
+        id: id,
+        sort_id: index + 1
+      }))
+
+      await axios.patch(`${API_URL}/reorder`, reorderData, {
+        headers: {
+          'Authorization': `Bearer ${AUTH_TOKEN}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      await fetchAllSections()
+      setIsReorderModalOpen(false)
+    } catch (error) {
+      console.error('Error saving new order:', error)
+    }
+  }
+
+  const handleAddSection = () => {
+    const lastId = aboutSections.length > 0 
+      ? parseInt(aboutSections[aboutSections.length - 1].id.toString())
+      : 0
+    const newId = (lastId + 1)
+
+    const newSection: AboutData = {
+      id: '1000',
+      sort_id: newId,
+      title: 'New About Section',
+      paragraph_1: 'Enter first paragraph here...',
+      paragraph_2: 'Enter second paragraph here...',
+      paragraph_3: 'Enter third paragraph here...',
+      image: null
+    }
+    setAboutSections([...aboutSections, newSection])
+  }
+
+  const handleSubmit = async (sectionData: {
+    id: string,
+    title: string,
+    paragraph1: string,
+    paragraph2: string,
+    paragraph3: string,
+    image: string,
+  }) => {
+    try {
+      const formData = new FormData()
+      formData.append('title', sectionData.title)
+      formData.append('paragraph_1', sectionData.paragraph1)
+      formData.append('paragraph_2', sectionData.paragraph2)
+      formData.append('paragraph_3', sectionData.paragraph3)
+
+      if (sectionData.image && sectionData.image !== '/placeholder.svg') {
+        if (sectionData.image.startsWith('data:image/png;base64,')) {
+          const imageBlob = DataURIToBlob(sectionData.image)
+          formData.append('image', imageBlob)
+        } else {
+          const imageBlob = await fetch(sectionData.image).then(r => r.blob())
+          formData.append('image', imageBlob)
+        }
+      }
+
+      if (sectionData.id === '1000') {
+        await axios({
+          method: 'post',
+          url: API_URL,
+          data: formData,
+          headers: {
+            'Authorization': `Bearer ${AUTH_TOKEN}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+      } else {
+        await axios({
+          method: 'put',
+          url: `${API_URL}/${sectionData.id}`,
+          data: formData,
+          headers: {
+            'Authorization': `Bearer ${AUTH_TOKEN}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+      }
+
+      await fetchAllSections()
+    } catch (error) {
+      console.error('Error submitting about section:', error)
+      throw error
+    }
+  }
+
   return (
-    <div className="container mx-auto">
-      <h1 className="text-2xl font-bold mb-4">About</h1>
-      {/* Add your about content here */}
+    <div className="container mx-auto p-4 space-y-8">
+      {aboutSections.map((section) => (
+        <AboutCard
+          key={section.id}
+          submitRef={submitRef}
+          id={section.id.toString()}
+          sortId={section.sort_id}
+          defaultTitle={section.title}
+          defaultParagraph1={section.paragraph_1}
+          defaultParagraph2={section.paragraph_2}
+          defaultParagraph3={section.paragraph_3}
+          defaultImage={section.image ? `data:image/png;base64,${section.image}` : '/placeholder.svg'}
+          onDelete={handleDelete}
+          onReorder={handleReorder}
+          onSubmit={handleSubmit}
+        />
+      ))}
+      <ReorderModal
+        isOpen={isReorderModalOpen}
+        onClose={() => setIsReorderModalOpen(false)}
+        cards={aboutSections.map(section => ({
+          id: section.id.toString(),
+          sort_id: section.sort_id,
+          title: `About ${section.id}`,
+        }))}
+        onSave={handleSaveReorder}
+      />
+      <AddButton onAdd={handleAddSection} label="Add New Section" />
     </div>
   )
 }
+
+export { AboutPage, type AboutData }
