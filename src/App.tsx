@@ -5,6 +5,7 @@ import { HomePage } from './components/pages/home'
 import { AboutPage } from './components/pages/about'
 import { GalleryPage } from './components/pages/gallery'
 import { ContactPage } from './components/pages/contact'
+import { SocialPage } from './components/pages/social'
 
 function App() {
   return (
@@ -28,26 +29,21 @@ function App() {
             }>
               Gallery
             </NavLink>
-            {/* <NavLink to="/settings" className={({ isActive }) => 
-              `px-3 py-2 rounded-md ${isActive ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700'}`
-            }>
-              Settings
-            </NavLink> */}
             <NavLink to="/about" className={({ isActive }) => 
               `px-3 py-2 rounded-md ${isActive ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700'}`
             }>
               About
+            </NavLink>
+            <NavLink to="/social" className={({ isActive }) => 
+              `px-3 py-2 rounded-md ${isActive ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700'}`
+            }>
+              Social
             </NavLink>
             <NavLink to="/contact" className={({ isActive }) => 
               `px-3 py-2 rounded-md ${isActive ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700'}`
             }>
               Contact
             </NavLink>
-            {/* <NavLink to="/login" className={({ isActive }) => 
-              `px-3 py-2 rounded-md ${isActive ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700'}`
-            }>
-              Login
-            </NavLink> */}
           </div>
         </nav>
 
@@ -57,10 +53,9 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/game" element={<GamePage />} />
             <Route path="/gallery" element={<GalleryPage />} />
-            {/* <Route path="/settings" element={<SettingsPage />} /> */}
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/social" element={<SocialPage />} />
             <Route path="/contact" element={<ContactPage />} />
-            {/* <Route path="/login" element={<LoginPage />} /> */}
           </Routes>
         </div>
       </div>
