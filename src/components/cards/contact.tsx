@@ -20,8 +20,8 @@ interface ContactCardProps {
   onSubmit: (data: {
     id: string
     email: string,
-    backgroundImage: string,
-    iconImage: string
+    background_image: string,
+    logo: string
   }) => Promise<void>
   submitRef: React.MutableRefObject<(() => void) | null>
 }
@@ -68,8 +68,8 @@ const ContactCard = ({
       await onSubmit({
         id,
         email: email.trim() || 'example@email.com',
-        backgroundImage,
-        iconImage
+        background_image: backgroundImage,
+        logo: iconImage
       });
 
       setIsSubmitted(true)

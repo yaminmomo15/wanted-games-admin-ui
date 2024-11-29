@@ -42,7 +42,6 @@ const GalleryCard = ({
       const file = acceptedFiles[0]
       const imageUrl = URL.createObjectURL(file)
       setImage(imageUrl)
-      submitRef.current?.()
     }
   })
 

@@ -24,7 +24,7 @@ export function ContactPage() {
     try {
       // Fetch both email and media data in parallel
       const [emailResponse, mediaResponse] = await Promise.all([
-        axios.get<{ id: string, email: string }[]>(API_URL_email),
+        axios.get<{ id: string, address: string }[]>(API_URL_email),
         axios.get<{ id: string, label: string, image: string }[]>(API_URL_images)
       ]);
 
@@ -37,15 +37,11 @@ export function ContactPage() {
 
       // Combine the data from both endpoints
       const combinedContacts = emailResponse.data.map(emailData => {
-        // Find background_image and logo for this email
-        const backgroundImage = mediaData.find(m => m.label === 'background_image')?.image || null;
-        const logo = mediaData.find(m => m.label === 'logo')?.image || null;
-
         return {
           id: emailData.id,
-          email: emailData.email,
-          background_image: backgroundImage,
-          logo: logo
+          email: emailData.address,
+          background_image: mediaData[0].image,  // First image (background_image)
+          logo: mediaData[1].image              // Second image (logo)
         };
       });
 
@@ -59,100 +55,69 @@ export function ContactPage() {
     fetchAllContacts();
   }, []);
 
-  const handleDelete = async (id: string) => {
-    try {
-      await axios.delete(`${API_URL}/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${AUTH_TOKEN}`
-        }
-      });
-      await fetchAllContacts();
-    } catch (error) {
-      console.error('Error deleting contact:', error);
-    }
-  }
-
-  const handleAddContact = () => {
-    const lastId = contacts.length > 0 
-      ? parseInt(contacts[contacts.length - 1].id.toString())
-      : 0;
-    const newId = (lastId + 1);
-
-    const newContact: ContactData = {
-      id: '1000',
-      email: 'example@email.com',
-      background_image: null,
-      logo: null
-    };
-    setContacts([...contacts, newContact]);
-  };
 
   const handleSubmit = async (contactData: {
     id: string,
     email: string,
-    backgroundImage: string,
-    iconImage: string
+    background_image: string,
+    logo: string
   }) => {
     try {
-      // Find current contact data to compare changes
-      const currentContact = contacts.find(c => c.id.toString() === contactData.id);
+      // Add debug logging
+      console.log('contactData received:', contactData);
       
-      // Check if email has changed
-      const hasEmailChanged = currentContact && currentContact.email !== contactData.email;
-      // Check if images have changed (excluding placeholder)
-      const hasBackgroundChanged = contactData.backgroundImage !== '/placeholder.svg' && 
-        contactData.backgroundImage !== `data:image/png;base64,${currentContact?.background_image}`;
-      const hasLogoChanged = contactData.iconImage !== '/placeholder.svg' && 
-        contactData.iconImage !== `data:image/png;base64,${currentContact?.logo}`;
-
-      // Only send email request if it's a new contact or email has changed
-      if (contactData.id === '1000' || hasEmailChanged) {
-        await axios({
-          method: contactData.id === '1000' ? 'post' : 'put',
-          url: contactData.id === '1000' ? API_URL_email : `${API_URL_email}/${contactData.id}`,
-          data: {
-            email: contactData.email
-          },
-          headers: {
-            'Authorization': `Bearer ${AUTH_TOKEN}`,
-            'Content-Type': 'application/json'
-          }
-        });
-      }
-
-      // Only send images request if any image has changed
-      if (hasBackgroundChanged || hasLogoChanged) {
-        const formData = new FormData();
-
-        if (hasBackgroundChanged) {
-          if (contactData.backgroundImage.startsWith('data:image')) {
-            const backgroundImageBlob = DataURIToBlob(contactData.backgroundImage);
-            formData.append('background-image', backgroundImageBlob);
-          } else {
-            const backgroundImageBlob = await fetch(contactData.backgroundImage).then(r => r.blob());
-            formData.append('background-image', backgroundImageBlob);
-          }
+      // Send email request
+      await axios({
+        method: 'put',
+        url: `${API_URL_email}/${contactData.id}`,
+        data: {
+          address: contactData.email
+        },
+        headers: {
+          'Authorization': `Bearer ${AUTH_TOKEN}`,
+          'Content-Type': 'application/json'
         }
+      });
 
-        if (hasLogoChanged) {
-          if (contactData.iconImage.startsWith('data:image')) {
-            const iconImageBlob = DataURIToBlob(contactData.iconImage);
-            formData.append('logo', iconImageBlob);
-          } else {
-            const iconImageBlob = await fetch(contactData.iconImage).then(r => r.blob());
-            formData.append('logo', iconImageBlob);
-          }
+      // Handle images separately
+      const imagesToUpload = [
+        { id: 1, label: 'background_image', image: contactData.background_image },
+        { id: 2, label: 'logo', image: contactData.logo }
+      ];
+      
+      console.log('imagesToUpload array:', imagesToUpload);
+      
+      for (const imageData of imagesToUpload) {
+        if (!imageData) {
+          console.error('imageData is undefined in loop');
+          continue;
         }
-
-        await axios({
-          method: 'put',
-          url: `${API_URL_images}/${contactData.id}`,
-          data: formData,
-          headers: {
-            'Authorization': `Bearer ${AUTH_TOKEN}`,
-            'Content-Type': 'multipart/form-data'
+        
+        if (imageData.image && imageData.image !== '/placeholder.svg') {
+          const formData = new FormData();
+          
+          let imageBlob;
+          if (imageData.image.startsWith('data:image/png;base64,')) {
+            imageBlob = DataURIToBlob(imageData.image);
+          } else {
+            imageBlob = await fetch(imageData.image).then(r => r.blob());
           }
-        });
+          
+          formData.append('image', imageBlob);
+          formData.append('label', imageData.label);
+
+          console.log(`Uploading ${imageData.label} image`);
+          console.log(`${API_URL_images}`);
+          await axios({
+            method: 'put',
+            url: `${API_URL_images}?q=${encodeURIComponent(imageData.label)}`,
+            data: formData,
+            headers: {
+              'Authorization': `Bearer ${AUTH_TOKEN}`,
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+        }
       }
 
       await fetchAllContacts();
@@ -178,12 +143,10 @@ export function ContactPage() {
           defaultIconImage={contact.logo ? 
             `data:image/png;base64,${contact.logo}` : 
             '/placeholder.svg'
-          }
-          onDelete={handleDelete}
+          }  
           onSubmit={handleSubmit}
         />
       ))}
-      <AddButton onAdd={handleAddContact} label="Add New Contact" />
     </div>
   )
 }
