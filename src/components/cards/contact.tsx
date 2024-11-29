@@ -88,25 +88,34 @@ const ContactCard = ({
       <CardContent className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Background Image Section */}
-          <div
-            {...getBackgroundProps()}
-            className="relative aspect-video rounded-lg border-2 border-dashed border-gray-200 hover:border-gray-300 transition-colors cursor-pointer"
-          >
-            <input {...getBackgroundInput()} />
-            {backgroundImage ? (
-              <img
-                src={backgroundImage}
-                alt="Background"
-                className="w-full h-full object-cover rounded-lg"
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full">
-                <p className="text-sm text-gray-500">
-                  Drop background image here
-                </p>
-              </div>
-            )}
-          </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div
+                  {...getBackgroundProps()}
+                  className="relative aspect-video rounded-lg border-2 border-dashed border-gray-200 hover:border-gray-300 transition-colors cursor-pointer"
+                >
+                  <input {...getBackgroundInput()} />
+                  {backgroundImage ? (
+                    <img
+                      src={backgroundImage}
+                      alt="Background"
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <p className="text-sm text-gray-500">
+                        Drop background image here
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Background Image</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
           {/* Content Section */}
           <div className="space-y-4">
@@ -130,23 +139,32 @@ const ContactCard = ({
             )}
 
             {/* Icon Image */}
-            <div
-              {...getIconProps()}
-              className="w-24 h-24 rounded-lg border-2 border-dashed border-gray-200 hover:border-gray-300 transition-colors cursor-pointer"
-            >
-              <input {...getIconInput()} />
-              {iconImage ? (
-                <img
-                  src={iconImage}
-                  alt="Icon"
-                  className="w-full h-full object-cover rounded-lg"
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full">
-                  <ImageIcon className="w-8 h-8 text-gray-400" />
-                </div>
-              )}
-            </div>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    {...getIconProps()}
+                    className="w-24 h-24 rounded-lg border-2 border-dashed border-gray-200 hover:border-gray-300 transition-colors cursor-pointer"
+                  >
+                    <input {...getIconInput()} />
+                    {iconImage ? (
+                      <img
+                        src={iconImage}
+                        alt="Icon"
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <ImageIcon className="w-8 h-8 text-gray-400" />
+                      </div>
+                    )}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Logo</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
 
