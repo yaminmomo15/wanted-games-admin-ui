@@ -3,128 +3,43 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Outlet } from 'react-router-dom';
 import { Settings } from 'lucide-react';
+import { NavItem } from '../NavItem';
+import { MobileMenu } from '../MobileMenu';
 
 export function MainLayout() {
   const { logout } = useAuth();
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Navigation Bar */}
-      <nav className="bg-gray-800 p-4">
-        <div className="flex justify-between items-center">
-          <div className="flex gap-4">
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                `px-3 py-2 rounded-md ${
-                  isActive
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-300 hover:bg-gray-700'
-                }`
-              }
-            >
-              Home
-            </NavLink>
-            <NavLink
-              to="/about"
-              className={({ isActive }) =>
-                `px-3 py-2 rounded-md ${
-                  isActive
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-300 hover:bg-gray-700'
-                }`
-              }
-            >
-              About
-            </NavLink>
-            <NavLink
-              to="/game"
-              className={({ isActive }) =>
-                `px-3 py-2 rounded-md ${
-                  isActive
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-300 hover:bg-gray-700'
-                }`
-              }
-            >
-              Game
-            </NavLink>
-            <NavLink
-              to="/gallery"
-              className={({ isActive }) =>
-                `px-3 py-2 rounded-md ${
-                  isActive
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-300 hover:bg-gray-700'
-                }`
-              }
-            >
-              Gallery
-            </NavLink>
-			<NavLink
-              to="/contact"
-              className={({ isActive }) =>
-                `px-3 py-2 rounded-md ${
-                  isActive
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-300 hover:bg-gray-700'
-                }`
-              }
-            >
-              Contact
-            </NavLink>
-            <NavLink
-              to="/social"
-              className={({ isActive }) =>
-                `px-3 py-2 rounded-md ${
-                  isActive
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-300 hover:bg-gray-700'
-                }`
-              }
-            >
-              Social
-            </NavLink>
-            <NavLink
-              to="/phone"
-              className={({ isActive }) =>
-                `px-3 py-2 rounded-md ${isActive ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700'}`
-              }
-            >
-              Phone
-            </NavLink>	
-          </div>
-          
-          {/* Settings and Logout Buttons */}
-          <div className="flex gap-2">
-            <NavLink
-              to="/settings"
-              className={({ isActive }) =>
-                `px-3 py-2 rounded-md flex items-center ${
-                  isActive
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-300 hover:bg-gray-700'
-                }`
-              }
-            >
-              <Settings className="h-4 w-4 mr-2" />
-              Settings
-            </NavLink>
-            <Button
-              variant="ghost"
-              className="text-gray-300 hover:bg-gray-700"
-              onClick={logout}
-            >
-              Logout
-            </Button>
+    <div className="min-h-screen flex flex-col">
+      <header className="bg-gray-800 text-white">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center">
+              <a className="text-xl font-bold">Admin Mode</a>
+            </div>
+            <nav className="hidden md:flex space-x-4">
+              <NavItem href="/" label="Home" />
+              <NavItem href="/about" label="About" />
+              <NavItem href="/game" label="Game" />
+              <NavItem href="/gallery" label="Gallery" />
+              <NavItem href="/contact" label="Contact" />
+              <NavItem href="/social" label="Social" />
+              <NavItem href="/phone" label="Phone" />
+              <NavItem href="/settings" label="Settings" />
+              <NavItem href="/logout" label="Logout" />
+            </nav>
+            <MobileMenu />
           </div>
         </div>
-      </nav>
-
-      {/* Main Content */}
-      <main className="flex-1 p-6">
+      </header>
+      <main className="flex-1 container mx-auto px-4 py-8">
         <Outlet />
       </main>
+      <footer className="bg-gray-800 text-white py-4">
+        <div className="container mx-auto px-4 text-center">
+          © {new Date().getFullYear()} Wanted Games. All rights reserved.
+        </div>
+      </footer>
     </div>
   );
 } 
