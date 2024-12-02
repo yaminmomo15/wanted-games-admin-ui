@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react"
 import { GalleryCard } from "@/components/cards/gallery"
 import { ReorderModal } from "@/components/reorder-modal"
-import { AddGameButton } from "@/components/add-game-button"
+import { AddButton } from "../add-button"
 import axios from 'axios'
 import { DataURIToBlob } from '@/lib/utils'
-import { AddButton } from "../add-button"
+import { useAuth } from "@/hooks/useAuth"
 
 interface GalleryItem {
   id: string | number;
@@ -13,9 +13,9 @@ interface GalleryItem {
 }
 
 const API_URL = import.meta.env.VITE_API_URL + '/gallery';
-const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
 
 export function GalleryPage() {
+  const { token } = useAuth()
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [isReorderModalOpen, setIsReorderModalOpen] = useState(false);
   const submitRef = useRef<(() => void) | null>(null);
@@ -37,7 +37,7 @@ export function GalleryPage() {
     try {
       await axios.delete(`${API_URL}/${id}`, {
         headers: {
-          'Authorization': `Bearer ${AUTH_TOKEN}`
+          'Authorization': `Bearer ${token}`
         }
       });
       await fetchAllItems();
@@ -57,11 +57,9 @@ export function GalleryPage() {
         sort_id: index + 1
       }));
 
-      console.log(reorderData);
-
       await axios.patch(`${API_URL}/reorder`, reorderData, {
         headers: {
-          'Authorization': `Bearer ${AUTH_TOKEN}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -110,7 +108,7 @@ export function GalleryPage() {
           url: API_URL,
           data: formData,
           headers: {
-            'Authorization': `Bearer ${AUTH_TOKEN}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
           }
         });
@@ -121,7 +119,7 @@ export function GalleryPage() {
           url: `${API_URL}/${data.id}`,
           data: formData,
           headers: {
-            'Authorization': `Bearer ${AUTH_TOKEN}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
           }
         });

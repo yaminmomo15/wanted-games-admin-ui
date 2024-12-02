@@ -4,6 +4,7 @@ import { ReorderModal } from "@/components/reorder-modal"
 import { AddButton } from "../add-button"
 import axios from 'axios'
 import { DataURIToBlob } from '@/lib/utils'
+import { useAuth } from "@/hooks/useAuth"
 
 interface AboutData {
   id: string | number
@@ -16,9 +17,9 @@ interface AboutData {
 }
 
 const API_URL = import.meta.env.VITE_API_URL + '/about'
-const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN
 
 function AboutPage() {
+  const { token } = useAuth()
   const [aboutSections, setAboutSections] = useState<AboutData[]>([])
   const [isReorderModalOpen, setIsReorderModalOpen] = useState(false)
   const submitRef = useRef<(() => void) | null>(null)
@@ -40,7 +41,7 @@ function AboutPage() {
     try {
       await axios.delete(`${API_URL}/${id}`, {
         headers: {
-          'Authorization': `Bearer ${AUTH_TOKEN}`
+          'Authorization': `Bearer ${token}`
         }
       })
       await fetchAllSections()
@@ -62,7 +63,7 @@ function AboutPage() {
 
       await axios.patch(`${API_URL}/reorder`, reorderData, {
         headers: {
-          'Authorization': `Bearer ${AUTH_TOKEN}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       })
@@ -123,7 +124,7 @@ function AboutPage() {
           url: API_URL,
           data: formData,
           headers: {
-            'Authorization': `Bearer ${AUTH_TOKEN}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
           }
         })
@@ -133,7 +134,7 @@ function AboutPage() {
           url: `${API_URL}/${sectionData.id}`,
           data: formData,
           headers: {
-            'Authorization': `Bearer ${AUTH_TOKEN}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
           }
         })
@@ -170,7 +171,7 @@ function AboutPage() {
         cards={aboutSections.map(section => ({
           id: section.id.toString(),
           sort_id: section.sort_id,
-          title: `About ${section.id}`,
+          title: section.title,
         }))}
         onSave={handleSaveReorder}
       />

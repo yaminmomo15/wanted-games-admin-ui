@@ -4,6 +4,7 @@ import { ReorderModal } from "@/components/reorder-modal"
 import { AddButton } from "../add-button"
 import axios from 'axios'
 import { DataURIToBlob } from "@/lib/utils"
+import { useAuth } from "@/hooks/useAuth"
 
 interface PhoneData {
   id: string | number;
@@ -13,13 +14,13 @@ interface PhoneData {
 }
 
 const API_URL = import.meta.env.VITE_API_URL + '/phone';
-const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
 
 function PhonePage() {
+  const { token } = useAuth()
   const [phones, setPhones] = useState<PhoneData[]>([]);
   const [isReorderModalOpen, setIsReorderModalOpen] = useState(false);
   const submitRef = useRef<(() => void) | null>(null);
-  
+
   const fetchAllPhones = async () => {
     try {
       const response = await axios.get<PhoneData[]>(API_URL);
@@ -37,7 +38,7 @@ function PhonePage() {
     try {
       await axios.delete(`${API_URL}/${id}`, {
         headers: {
-          'Authorization': `Bearer ${AUTH_TOKEN}`
+          'Authorization': `Bearer ${token}`
         }
       });
       await fetchAllPhones();
@@ -59,7 +60,7 @@ function PhonePage() {
 
       await axios.patch(`${API_URL}/reorder`, reorderData, {
         headers: {
-          'Authorization': `Bearer ${AUTH_TOKEN}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -72,64 +73,51 @@ function PhonePage() {
   };
 
   const handleAddPhone = () => {
-    const lastId = phones.length > 0 
-      ? parseInt(phones[phones.length - 1].id.toString())
-      : 0;
-    const newId = (lastId + 1);
-
     const newPhone: PhoneData = {
       id: '1000',
-      sort_id: newId,
+      sort_id: phones.length + 1,
       image: null,
       number: ''
     };
     setPhones([...phones, newPhone]);
   };
 
-  const handleSubmit = async (phoneData: {
+  const handleSubmit = async (data: {
     id: string,
     image: string,
     number: string
   }) => {
     try {
       const formData = new FormData();
-      formData.append('number', phoneData.number);
+      formData.append('number', data.number);
 
-      // Handle image upload
-      if (phoneData.image && phoneData.image !== '/placeholder.svg') {
-        if (phoneData.image.startsWith('data:image/')) {
-          const iconImageBlob = DataURIToBlob(phoneData.image);
-          formData.append('image', iconImageBlob);
+      if (data.image && data.image !== '/placeholder.svg') {
+        if (data.image.startsWith('data:image/png;base64,')) {
+          const imageBlob = DataURIToBlob(data.image);
+          formData.append('image', imageBlob);
         } else {
-          const iconImageBlob = await fetch(phoneData.image).then(r => r.blob());
-          formData.append('image', iconImageBlob);
+          const imageBlob = await fetch(data.image).then(r => r.blob());
+          formData.append('image', imageBlob);
         }
       }
-      
-      if (phoneData.id === '1000') {
-        await axios({
-          method: 'post',
-          url: API_URL,
-          data: formData,
+
+      if (data.id === '1000') {
+        await axios.post(API_URL, formData, {
           headers: {
-            'Authorization': `Bearer ${AUTH_TOKEN}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
           }
         });
       } else {
-        await axios({
-          method: 'put',
-          url: `${API_URL}/${phoneData.id}`,
-          data: formData,
+        await axios.put(`${API_URL}/${data.id}`, formData, {
           headers: {
-            'Authorization': `Bearer ${AUTH_TOKEN}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
           }
         });
       }
 
       await fetchAllPhones();
-      console.log(`Phone number updated successfully`);
     } catch (error) {
       console.error('Error submitting phone:', error);
       throw error;
@@ -154,11 +142,7 @@ function PhonePage() {
       <ReorderModal
         isOpen={isReorderModalOpen}
         onClose={() => setIsReorderModalOpen(false)}
-        cards={phones.map(phone => ({ 
-          id: phone.id.toString(), 
-          sort_id: phone.sort_id, 
-          title: `Phone ${phone.id}`
-        }))}
+        cards={phones.map(phone => ({ id: phone.id.toString(), sort_id: phone.sort_id }))}
         onSave={handleSaveReorder}
       />
       <AddButton onAdd={handleAddPhone} label="Add New Phone Number" />
@@ -166,4 +150,4 @@ function PhonePage() {
   )
 }
 
-export { PhonePage, type PhoneData }
+export { PhonePage }

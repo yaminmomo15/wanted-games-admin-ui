@@ -4,6 +4,7 @@ import { ReorderModal } from "@/components/reorder-modal"
 import { AddButton } from "../add-button"
 import axios from 'axios'
 import { DataURIToBlob } from "@/lib/utils"
+import { useAuth } from "@/hooks/useAuth"
 
 interface SocialData {
   id: string | number;
@@ -13,13 +14,13 @@ interface SocialData {
 }
 
 const API_URL = import.meta.env.VITE_API_URL + '/social';
-const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
 
 function SocialPage() {
+  const { token } = useAuth()
   const [socials, setSocials] = useState<SocialData[]>([]);
   const [isReorderModalOpen, setIsReorderModalOpen] = useState(false);
   const submitRef = useRef<(() => void) | null>(null);
-  
+
   const fetchAllSocials = async () => {
     try {
       const response = await axios.get<SocialData[]>(API_URL);
@@ -37,10 +38,10 @@ function SocialPage() {
     try {
       await axios.delete(`${API_URL}/${id}`, {
         headers: {
-          'Authorization': `Bearer ${AUTH_TOKEN}`
+          'Authorization': `Bearer ${token}`
         }
       });
-      await fetchAllSocials(); // Refresh the list after deletion
+      await fetchAllSocials();
     } catch (error) {
       console.error('Error deleting social:', error);
     }
@@ -59,7 +60,7 @@ function SocialPage() {
 
       await axios.patch(`${API_URL}/reorder`, reorderData, {
         headers: {
-          'Authorization': `Bearer ${AUTH_TOKEN}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -72,64 +73,51 @@ function SocialPage() {
   };
 
   const handleAddSocial = () => {
-    const lastId = socials.length > 0 
-      ? parseInt(socials[socials.length - 1].id.toString())
-      : 0;
-    const newId = (lastId + 1);
-
     const newSocial: SocialData = {
       id: '1000',
-      sort_id: newId,
+      sort_id: socials.length + 1,
       image: null,
-      url: ''
+      url: 'https://'
     };
     setSocials([...socials, newSocial]);
   };
 
-  const handleSubmit = async (socialData: {
+  const handleSubmit = async (data: {
     id: string,
     image: string,
     url: string
   }) => {
     try {
       const formData = new FormData();
-      formData.append('url', socialData.url);
+      formData.append('url', data.url);
 
-      // Handle image upload
-      if (socialData.image && socialData.image !== '/placeholder.svg') {
-        if (socialData.image.startsWith('data:image/')) {
-          const iconImageBlob = DataURIToBlob(socialData.image);
-          formData.append('image', iconImageBlob);
+      if (data.image && data.image !== '/placeholder.svg') {
+        if (data.image.startsWith('data:image/png;base64,')) {
+          const imageBlob = DataURIToBlob(data.image);
+          formData.append('image', imageBlob);
         } else {
-          const iconImageBlob = await fetch(socialData.image).then(r => r.blob());
-          formData.append('image', iconImageBlob);
+          const imageBlob = await fetch(data.image).then(r => r.blob());
+          formData.append('image', imageBlob);
         }
       }
-      
-      if (socialData.id === '1000') {
-        await axios({
-          method: 'post',
-          url: API_URL,
-          data: formData,
+
+      if (data.id === '1000') {
+        await axios.post(API_URL, formData, {
           headers: {
-            'Authorization': `Bearer ${AUTH_TOKEN}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
           }
         });
       } else {
-        await axios({
-          method: 'put',
-          url: `${API_URL}/${socialData.id}`,
-          data: formData,
+        await axios.put(`${API_URL}/${data.id}`, formData, {
           headers: {
-            'Authorization': `Bearer ${AUTH_TOKEN}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
           }
         });
       }
 
       await fetchAllSocials();
-      console.log(`Social link updated successfully`);
     } catch (error) {
       console.error('Error submitting social:', error);
       throw error;
@@ -154,11 +142,7 @@ function SocialPage() {
       <ReorderModal
         isOpen={isReorderModalOpen}
         onClose={() => setIsReorderModalOpen(false)}
-        cards={socials.map(social => ({ 
-          id: social.id.toString(), 
-          sort_id: social.sort_id, 
-          title: `Social ${social.id}` // Using icon as title in reorder modal
-        }))}
+        cards={socials.map(social => ({ id: social.id.toString(), sort_id: social.sort_id }))}
         onSave={handleSaveReorder}
       />
       <AddButton onAdd={handleAddSocial} label="Add New Social Link" />
@@ -166,4 +150,4 @@ function SocialPage() {
   )
 }
 
-export { SocialPage, type SocialData }
+export { SocialPage }

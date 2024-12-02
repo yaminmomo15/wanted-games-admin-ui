@@ -4,7 +4,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
 import {
   Tooltip,
   TooltipContent,
@@ -26,16 +25,17 @@ interface AboutCardProps {
   onSubmit: (data: {
     id: string
     title: string
-    image: string
     paragraph1: string
     paragraph2: string
     paragraph3: string
+    image: string
   }) => Promise<void>
   submitRef: React.MutableRefObject<(() => void) | null>
 }
 
 const AboutCard = ({
   id,
+  sortId,
   defaultTitle = "New About Section",
   defaultImage = "/placeholder.svg",
   defaultParagraph1 = "Enter first paragraph here...",
@@ -73,10 +73,10 @@ const AboutCard = ({
       await onSubmit({
         id,
         title: title.trim() || 'New About Section',
-        image,
         paragraph1: paragraph1.trim() || 'Enter first paragraph here...',
         paragraph2: paragraph2.trim() || 'Enter second paragraph here...',
         paragraph3: paragraph3.trim() || 'Enter third paragraph here...',
+        image,
       });
 
       setIsSubmitted(true)

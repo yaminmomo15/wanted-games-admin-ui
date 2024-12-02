@@ -4,6 +4,8 @@ import { ReorderModal } from "@/components/reorder-modal"
 import { AddButton } from "../add-button"
 import axios from 'axios'
 import { DataURIToBlob } from '@/lib/utils'
+import { useAuth } from "@/hooks/useAuth"
+
 interface GameData {
   id: string | number;
   sort_id: number;
@@ -16,6 +18,7 @@ interface GameData {
   image_3: string | null;
   background_color: string;
   text_color: string;
+  url: string;
 }
 
 interface NewGameData {
@@ -28,12 +31,13 @@ interface NewGameData {
   image_3: string | null;
   background_color: string;
   text_color: string;
+  url: string;
 }
 
 const API_URL = import.meta.env.VITE_API_URL + '/games';
-const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
 
 function GamePage() {
+  const { token } = useAuth()
   const [games, setGames] = useState<GameData[]>([]);
   const [isReorderModalOpen, setIsReorderModalOpen] = useState(false);
   const submitRef = useRef<(() => void) | null>(null);
@@ -55,7 +59,7 @@ function GamePage() {
     try {
       await axios.delete(`${API_URL}/${id}`, {
         headers: {
-          'Authorization': `Bearer ${AUTH_TOKEN}`
+          'Authorization': `Bearer ${token}`
         }
       });
       await fetchAllGames(); // Refresh the list after deletion
@@ -78,7 +82,7 @@ function GamePage() {
 
       await axios.patch(`${API_URL}/reorder`, reorderData, {
         headers: {
-          'Authorization': `Bearer ${AUTH_TOKEN}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -103,6 +107,7 @@ function GamePage() {
       title: 'New Game Title',
       description_1: 'Enter first description here...',
       description_2: 'Enter second description here...',
+      url: 'https://example.com',
       image_main: null,
       image_1: null,
       image_2: null,
@@ -116,6 +121,7 @@ function GamePage() {
     title: string,
     description1: string,
     description2: string,
+    url: string,
     mainImage: string,
     smallImages: string[],
     backgroundColor: string,
@@ -126,6 +132,7 @@ function GamePage() {
       formData.append('title', gameData.title);
       formData.append('description_1', gameData.description1);
       formData.append('description_2', gameData.description2);
+      formData.append('url', gameData.url);
       formData.append('background_color', gameData.backgroundColor);
       formData.append('text_color', gameData.textColor);
 
@@ -157,7 +164,7 @@ function GamePage() {
           url: API_URL,
           data: formData,
           headers: {
-            'Authorization': `Bearer ${AUTH_TOKEN}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
           }
         });
@@ -168,7 +175,7 @@ function GamePage() {
           url: `${API_URL}/${gameData.id}`,
           data: formData,
           headers: {
-            'Authorization': `Bearer ${AUTH_TOKEN}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
           }
         });

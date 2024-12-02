@@ -4,6 +4,7 @@ import { ReorderModal } from "@/components/reorder-modal"
 import { AddButton } from "../add-button"
 import axios from 'axios'
 import { DataURIToBlob } from '@/lib/utils'
+import { useAuth } from "@/hooks/useAuth"
 
 interface HomeData {
   id: string | number;
@@ -16,9 +17,9 @@ interface HomeData {
 }
 
 const API_URL = import.meta.env.VITE_API_URL + '/home';
-const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
 
 export function HomePage() {
+  const { token } = useAuth()
   const [homeContent, setHomeContent] = useState<HomeData[]>([]);
   const [isReorderModalOpen, setIsReorderModalOpen] = useState(false);
   const submitRef = useRef<(() => void) | null>(null);
@@ -40,7 +41,7 @@ export function HomePage() {
     try {
       await axios.delete(`${API_URL}/${id}`, {
         headers: {
-          'Authorization': `Bearer ${AUTH_TOKEN}`
+          'Authorization': `Bearer ${token}`
         }
       });
       await fetchAllContent();
@@ -62,7 +63,7 @@ export function HomePage() {
 
       await axios.patch(`${API_URL}/reorder`, reorderData, {
         headers: {
-          'Authorization': `Bearer ${AUTH_TOKEN}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -123,7 +124,7 @@ export function HomePage() {
           url: API_URL,
           data: formData,
           headers: {
-            'Authorization': `Bearer ${AUTH_TOKEN}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
           }
         });
@@ -133,7 +134,7 @@ export function HomePage() {
           url: `${API_URL}/${contentData.id}`,
           data: formData,
           headers: {
-            'Authorization': `Bearer ${AUTH_TOKEN}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
           }
         });

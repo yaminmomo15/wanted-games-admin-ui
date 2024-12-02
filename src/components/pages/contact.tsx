@@ -3,7 +3,7 @@ import { ContactCard } from "@/components/cards/contact"
 import { AddButton } from "../add-button"
 import axios from 'axios'
 import { DataURIToBlob } from '@/lib/utils'
-
+import { useAuth } from "@/hooks/useAuth"
 
 interface ContactData {
   id: string | number;
@@ -14,12 +14,12 @@ interface ContactData {
 
 const API_URL_email = import.meta.env.VITE_API_URL + '/email';
 const API_URL_images = import.meta.env.VITE_API_URL + '/media';
-const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
 
-export function ContactPage() {
+function ContactPage() {
+  const { token } = useAuth()
   const [contacts, setContacts] = useState<ContactData[]>([]);
   const submitRef = useRef<(() => void) | null>(null);
-  
+
   const fetchAllContacts = async () => {
     try {
       // Fetch both email and media data in parallel
@@ -74,7 +74,7 @@ export function ContactPage() {
           address: contactData.email
         },
         headers: {
-          'Authorization': `Bearer ${AUTH_TOKEN}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -113,7 +113,7 @@ export function ContactPage() {
             url: `${API_URL_images}?q=${encodeURIComponent(imageData.label)}`,
             data: formData,
             headers: {
-              'Authorization': `Bearer ${AUTH_TOKEN}`,
+              'Authorization': `Bearer ${token}`,
               'Content-Type': 'multipart/form-data'
             }
           });
@@ -150,3 +150,5 @@ export function ContactPage() {
     </div>
   )
 }
+
+export { ContactPage }

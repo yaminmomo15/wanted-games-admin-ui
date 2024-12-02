@@ -18,17 +18,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { Send, ArrowUpDown, Trash2, ImageIcon, Pencil, Check } from 'lucide-react'
-// interface GameData {
-//   id: string
-//   sort_id: number
-//   title: string
-//   description_1: string
-//   description_2: string
-//   image_main: string
-//   image_1?: string
-//   image_2?: string
-//   image_3?: string
-// }
 
 interface GameCardProps {
   id: string
@@ -40,6 +29,7 @@ interface GameCardProps {
   defaultSmallImages?: string[]
   defaultBackgroundColor?: string
   defaultTextColor?: string
+  defaultUrl?: string
   onDelete: (id: string) => void
   onReorder: () => void
   onSubmit: (data: {
@@ -47,6 +37,7 @@ interface GameCardProps {
     title: string,
     description1: string,
     description2: string,
+    url: string,
     mainImage: string,
     smallImages: string[]
     backgroundColor: string,
@@ -65,6 +56,7 @@ const GameCard = ({
   defaultSmallImages = [],
   defaultBackgroundColor = "#ffffff",
   defaultTextColor = "#000000",
+  defaultUrl = "https://example.com",
   onDelete,
   onReorder,
   onSubmit,
@@ -73,6 +65,7 @@ const GameCard = ({
   const [title, setTitle] = useState(defaultTitle)
   const [description1, setDescription1] = useState(defaultDescription1)
   const [description2, setDescription2] = useState(defaultDescription2)
+  const [url, setUrl] = useState(defaultUrl)
   const [mainImage, setMainImage] = useState<string>(defaultImage)
   const [smallImages, setSmallImages] = useState<string[]>(
     defaultSmallImages.length > 0 
@@ -82,10 +75,11 @@ const GameCard = ({
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [isEditingDesc1, setIsEditingDesc1] = useState(false)
   const [isEditingDesc2, setIsEditingDesc2] = useState(false)
+  const [isEditingUrl, setIsEditingUrl] = useState(false)
   const [backgroundColor, setBackgroundColor] = useState(defaultBackgroundColor)
   const [textColor, setTextColor] = useState(defaultTextColor)
   const [isSubmitted, setIsSubmitted] = useState(false)
-  
+
   const { getRootProps: getMainProps, getInputProps: getMainInput } = useDropzone({
     accept: {
       "image/*": []
@@ -112,6 +106,7 @@ const GameCard = ({
         title: title.trim() || 'New Game Title',
         description1: description1.trim() || 'Enter first description here...',
         description2: description2.trim() || 'Enter second description here...',
+        url: url.trim() || 'https://example.com',
         mainImage,
         smallImages,
         backgroundColor,
@@ -129,6 +124,7 @@ const GameCard = ({
       setIsEditingTitle(false);
       setIsEditingDesc1(false);
       setIsEditingDesc2(false);
+      setIsEditingUrl(false);
     } catch (error) {
       console.error('Error submitting game:', error);
     }
@@ -227,6 +223,24 @@ const GameCard = ({
                 onClick={() => setIsEditingDesc2(true)}
               >
                 {description2 || "Second description goes here"}
+              </p>
+            )}
+
+            {isEditingUrl ? (
+              <Input
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="Enter URL"
+                className="w-full"
+                onBlur={() => setIsEditingUrl(false)}
+                autoFocus
+              />
+            ) : (
+              <p 
+                className="text-gray-600 cursor-pointer hover:bg-gray-100 p-1 rounded"
+                onClick={() => setIsEditingUrl(true)}
+              >
+                {url || "https://example.com"}
               </p>
             )}
 
