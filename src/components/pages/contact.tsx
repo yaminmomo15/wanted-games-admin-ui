@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react"
 import { ContactCard } from "@/components/cards/contact"
 import { AddButton } from "../add-button"
 import axios from 'axios'
-import { DataURIToBlob } from '@/lib/utils'
 import { useAuth } from "@/hooks/useAuth"
 
 interface ContactData {
@@ -63,9 +62,6 @@ function ContactPage() {
     logo: string
   }) => {
     try {
-      // Add debug logging
-      console.log('contactData received:', contactData);
-      
       // Send email request
       await axios({
         method: 'put',
@@ -85,39 +81,27 @@ function ContactPage() {
         { id: 2, label: 'logo', image: contactData.logo }
       ];
       
-      console.log('imagesToUpload array:', imagesToUpload);
-      
       for (const imageData of imagesToUpload) {
-        if (!imageData) {
-          console.error('imageData is undefined in loop');
+        if (!imageData || !imageData.image || imageData.image === '/placeholder.svg') {
           continue;
         }
-        
-        if (imageData.image && imageData.image !== '/placeholder.svg') {
-          const formData = new FormData();
-          
-          let imageBlob;
-          if (imageData.image.startsWith('data:image/png;base64,')) {
-            imageBlob = DataURIToBlob(imageData.image);
-          } else {
-            imageBlob = await fetch(imageData.image).then(r => r.blob());
-          }
-          
-          formData.append('image', imageBlob);
-          formData.append('label', imageData.label);
 
-          console.log(`Uploading ${imageData.label} image`);
-          console.log(`${API_URL_images}`);
-          await axios({
-            method: 'put',
-            url: `${API_URL_images}?q=${encodeURIComponent(imageData.label)}`,
-            data: formData,
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'multipart/form-data'
-            }
-          });
-        }
+        const formData = new FormData();
+        formData.append('label', imageData.label);
+        
+        // If it's a URL, fetch and append the image
+        const imageBlob = await fetch(imageData.image).then(r => r.blob());
+        formData.append('image', imageBlob, 'image.png');
+
+        await axios({
+          method: 'put',
+          url: `${API_URL_images}?q=${encodeURIComponent(imageData.label)}`,
+          data: formData,
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        });
       }
 
       await fetchAllContacts();
@@ -136,14 +120,8 @@ function ContactPage() {
           submitRef={submitRef}
           id={contact.id.toString()}
           defaultEmail={contact.email}
-          defaultBackgroundImage={contact.background_image ? 
-            `data:image/png;base64,${contact.background_image}` : 
-            '/placeholder.svg'
-          }
-          defaultIconImage={contact.logo ? 
-            `data:image/png;base64,${contact.logo}` : 
-            '/placeholder.svg'
-          }  
+          defaultBackgroundImage={contact.background_image || '/placeholder.svg'}
+          defaultIconImage={contact.logo || '/placeholder.svg'}
           onSubmit={handleSubmit}
         />
       ))}

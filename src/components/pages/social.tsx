@@ -94,10 +94,10 @@ function SocialPage() {
       if (data.image && data.image !== '/placeholder.svg') {
         if (data.image.startsWith('data:image/png;base64,')) {
           const imageBlob = DataURIToBlob(data.image);
-          formData.append('image', imageBlob);
+          formData.append('image', imageBlob, 'image.png');
         } else {
           const imageBlob = await fetch(data.image).then(r => r.blob());
-          formData.append('image', imageBlob);
+          formData.append('image', imageBlob, 'image.png');
         }
       }
 

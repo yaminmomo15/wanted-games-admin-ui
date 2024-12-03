@@ -111,10 +111,10 @@ export function HomePage() {
       if (contentData.image && contentData.image !== '/placeholder.svg') {
         if (contentData.image.startsWith('data:image/png;base64,')) {
           const imageBlob = DataURIToBlob(contentData.image);
-          formData.append('image', imageBlob);
+          formData.append('image', imageBlob, 'image.png');
         } else {
           const imageBlob = await fetch(contentData.image).then(r => r.blob());
-          formData.append('image', imageBlob);
+          formData.append('image', imageBlob, 'image.png');
         }
       }
       

@@ -100,19 +100,19 @@ function Game({ label }: GameProps) {
 
       if (mainImage) {
         const mainImageFile = DataURIToBlob(mainImage);
-        formData.append('image_main', mainImageFile);
+        formData.append('image_main', mainImageFile, 'image_main.png');
       }
       if (icon1) {
         const icon1Blob = DataURIToBlob(icon1);
-        formData.append('image_1', icon1Blob);
+        formData.append('image_1', icon1Blob, 'image_1.png');
       }
       if (icon2) {
         const icon2Blob = DataURIToBlob(icon2);
-        formData.append('image_2', icon2Blob);
+        formData.append('image_2', icon2Blob, 'image_2.png');
       }
       if (icon3) {
         const icon3Blob = DataURIToBlob(icon3);
-        formData.append('image_3', icon3Blob);
+        formData.append('image_3', icon3Blob, 'image_3.png');
       }
 
       await axios.put(`${API_URL}?q=${label}`, formData, {

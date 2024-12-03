@@ -111,10 +111,10 @@ function AboutPage() {
       if (sectionData.image && sectionData.image !== '/placeholder.svg') {
         if (sectionData.image.startsWith('data:image/png;base64,')) {
           const imageBlob = DataURIToBlob(sectionData.image)
-          formData.append('image', imageBlob)
+          formData.append('image', imageBlob, 'image.png')
         } else {
           const imageBlob = await fetch(sectionData.image).then(r => r.blob())
-          formData.append('image', imageBlob)
+          formData.append('image', imageBlob, 'image.png')
         }
       }
 

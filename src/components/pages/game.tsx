@@ -3,7 +3,6 @@ import { GameCard } from "@/components/cards/game"
 import { ReorderModal } from "@/components/reorder-modal"
 import { AddButton } from "../add-button"
 import axios from 'axios'
-import { DataURIToBlob } from '@/lib/utils'
 import { useAuth } from "@/hooks/useAuth"
 
 interface GameData {
@@ -12,10 +11,10 @@ interface GameData {
   title: string;
   description_1: string;
   description_2: string;
-  image_main: string | null;
-  image_1: string | null;
-  image_2: string | null;
-  image_3: string | null;
+  image_main_url: string | null;
+  image_1_url: string | null;
+  image_2_url: string | null;
+  image_3_url: string | null;
   background_color: string;
   text_color: string;
   url: string;
@@ -45,6 +44,7 @@ function GamePage() {
   const fetchAllGames = async () => {
     try {
       const response = await axios.get<GameData[]>(API_URL);
+      console.log(response.data)
       setGames(response.data);
     } catch (error) {
       console.error('Error fetching games:', error);
@@ -108,10 +108,12 @@ function GamePage() {
       description_1: 'Enter first description here...',
       description_2: 'Enter second description here...',
       url: 'https://example.com',
-      image_main: null,
-      image_1: null,
-      image_2: null,
-      image_3: null
+      image_main_url: null,
+      image_1_url: null,
+      image_2_url: null,
+      image_3_url: null,
+      background_color: '#ffffff',
+      text_color: '#000000'
     };
     setGames([...games, newGame]);
   };
@@ -137,24 +139,14 @@ function GamePage() {
       formData.append('text_color', gameData.textColor);
 
       if (gameData.mainImage && gameData.mainImage !== '/placeholder.svg') {
-        if (gameData.mainImage.startsWith('data:image/png;base64,')) {
-          const mainImageBlob = DataURIToBlob(gameData.mainImage);
-          formData.append('image_main', mainImageBlob);
-        } else {
-          const mainImageBlob = await fetch(gameData.mainImage).then(r => r.blob());
-          formData.append('image_main', mainImageBlob);
-        }
+        const mainImageBlob = await fetch(gameData.mainImage).then(r => r.blob());
+        formData.append('image_main', mainImageBlob, 'image_main.png');
       }
 
       for (let i = 0; i < gameData.smallImages.length; i++) {
         if (gameData.smallImages[i] && gameData.smallImages[i] !== '/placeholder.svg') {
-          if (gameData.smallImages[i].startsWith('data:image/png;base64,')) {
-            const smallImageBlob = DataURIToBlob(gameData.smallImages[i]);
-            formData.append(`image_${i + 1}`, smallImageBlob);
-          } else {
-            const smallImageBlob = await fetch(gameData.smallImages[i]).then(r => r.blob());
-            formData.append(`image_${i + 1}`, smallImageBlob);
-          }
+          const smallImageBlob = await fetch(gameData.smallImages[i]).then(r => r.blob());
+          formData.append(`image_${i + 1}`, smallImageBlob, `image_${i + 1}.png`);
         }
       }
       
@@ -181,7 +173,7 @@ function GamePage() {
         });
         await fetchAllGames();
       }
-
+  
       console.log(`Game updated successfully`);
     } catch (error) {
       console.error('Error submitting game:', error);
@@ -204,14 +196,15 @@ function GamePage() {
           defaultTitle={game.title}
           defaultDescription1={game.description_1}
           defaultDescription2={game.description_2}
-          defaultImage={game.image_main ? `data:image/png;base64,${game.image_main}` : '/placeholder.svg'}
+          defaultImage={game.image_main_url || '/placeholder.svg'}
           defaultSmallImages={[
-            game.image_1 ? `data:image/png;base64,${game.image_1}` : '/placeholder.svg',
-            game.image_2 ? `data:image/png;base64,${game.image_2}` : '/placeholder.svg',
-            game.image_3 ? `data:image/png;base64,${game.image_3}` : '/placeholder.svg'
+            game.image_1_url || '/placeholder.svg',
+            game.image_2_url || '/placeholder.svg',
+            game.image_3_url || '/placeholder.svg'
           ]}
           defaultBackgroundColor={game.background_color}
           defaultTextColor={game.text_color}
+          defaultUrl={game.url}
           onDelete={handleDelete}
           onReorder={handleReorder}
           onSubmit={handleSubmit}

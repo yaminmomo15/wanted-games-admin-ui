@@ -3,13 +3,12 @@ import { GalleryCard } from "@/components/cards/gallery"
 import { ReorderModal } from "@/components/reorder-modal"
 import { AddButton } from "../add-button"
 import axios from 'axios'
-import { DataURIToBlob } from '@/lib/utils'
 import { useAuth } from "@/hooks/useAuth"
 
 interface GalleryItem {
   id: string | number;
   sort_id: number;
-  image: string | null;
+  image_url: string | null;
 }
 
 const API_URL = import.meta.env.VITE_API_URL + '/gallery';
@@ -80,7 +79,7 @@ export function GalleryPage() {
     const newItem: GalleryItem = {
       id: '1000',
       sort_id: newId,
-      image: null
+      image_url: null
     };
     setItems([...items, newItem]);
   };
@@ -93,13 +92,8 @@ export function GalleryPage() {
       const formData = new FormData();
 
       if (data.image && data.image !== '/placeholder.svg') {
-        if (data.image.startsWith('data:image/')) {
-          const imageBlob = DataURIToBlob(data.image);
-          formData.append('image', imageBlob);
-        } else {
-          const imageBlob = await fetch(data.image).then(r => r.blob());
-          formData.append('image', imageBlob);
-        }
+        const imageBlob = await fetch(data.image).then(r => r.blob());
+        formData.append('image', imageBlob);
       }
       
       if (data.id === '1000') {
@@ -112,7 +106,6 @@ export function GalleryPage() {
             'Content-Type': 'multipart/form-data'
           }
         });
-        await fetchAllItems();
       } else {
         await axios({
           method: 'put',
@@ -123,7 +116,6 @@ export function GalleryPage() {
             'Content-Type': 'multipart/form-data'
           }
         });
-        await fetchAllItems();
       }
 
       console.log(`Gallery item updated successfully`);
@@ -141,7 +133,7 @@ export function GalleryPage() {
             key={item.id}
             id={item.id.toString()}
             sortId={item.sort_id}
-            defaultImage={item.image ? `data:image/png;base64,${item.image}` : '/placeholder.svg'}
+            defaultImage={item.image_url || '/placeholder.svg'}
             onDelete={handleDelete}
             onReorder={handleReorder}
             onSubmit={handleSubmit}

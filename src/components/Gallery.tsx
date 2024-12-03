@@ -50,7 +50,7 @@ const Gallery: React.FC = () => {
 		}
 
 		const formData = new FormData();
-		formData.append('image', newImage);
+		formData.append('image', newImage, 'image.png');
 		formData.append('label', newLabel);
 
 		try {

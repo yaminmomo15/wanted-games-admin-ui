@@ -35,7 +35,6 @@ function AllGames() {
       const sortedGames = response.data.sort((a, b) => 
         a.label.localeCompare(b.label)
       );
-      
       setGames(sortedGames);
     } catch (error) {
       console.error('Error fetching games:', error);
