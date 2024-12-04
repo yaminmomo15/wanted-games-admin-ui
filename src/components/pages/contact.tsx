@@ -24,7 +24,7 @@ function ContactPage() {
       // Fetch both email and media data in parallel
       const [emailResponse, mediaResponse] = await Promise.all([
         axios.get<{ id: string, address: string }[]>(API_URL_email),
-        axios.get<{ id: string, label: string, image: string }[]>(API_URL_images)
+        axios.get<{ id: string, label: string, image_url: string }[]>(API_URL_images)
       ]);
 
       // Parse and validate media data
@@ -39,8 +39,8 @@ function ContactPage() {
         return {
           id: emailData.id,
           email: emailData.address,
-          background_image: mediaData[0].image,  // First image (background_image)
-          logo: mediaData[1].image              // Second image (logo)
+          background_image: mediaData[0].image_url,  // First image (background_image)
+          logo: mediaData[1].image_url              // Second image (logo)
         };
       });
 

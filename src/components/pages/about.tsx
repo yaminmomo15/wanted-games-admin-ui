@@ -13,7 +13,7 @@ interface AboutData {
   paragraph_1: string
   paragraph_2: string
   paragraph_3: string
-  image: string | null
+  image_url: string | null
 }
 
 const API_URL = import.meta.env.VITE_API_URL + '/about'
@@ -159,7 +159,7 @@ function AboutPage() {
           defaultParagraph1={section.paragraph_1}
           defaultParagraph2={section.paragraph_2}
           defaultParagraph3={section.paragraph_3}
-          defaultImage={section.image ? `data:image/png;base64,${section.image}` : '/placeholder.svg'}
+          defaultImage={section.image_url || '/placeholder.svg'}
           onDelete={handleDelete}
           onReorder={handleReorder}
           onSubmit={handleSubmit}

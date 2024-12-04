@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/useAuth"
 interface SocialData {
   id: string | number;
   sort_id: number;
-  image: string | null;
+  image_url: string | null;
   url: string;
 }
 
@@ -132,7 +132,7 @@ function SocialPage() {
           submitRef={submitRef}
           id={social.id.toString()}
           sortId={social.sort_id}
-          defaultImage={social.image ? `data:image/png;base64,${social.image}` : '/placeholder.svg'}
+          defaultImage={social.image_url || '/placeholder.svg'}
           defaultUrl={social.url}
           onDelete={handleDelete}
           onReorder={handleReorder}

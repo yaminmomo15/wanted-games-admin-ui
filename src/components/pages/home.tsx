@@ -13,7 +13,7 @@ interface HomeData {
   paragraph_1: string;
   paragraph_2: string;
   action: string;
-  image: string | null;
+  image_url: string | null;
 }
 
 const API_URL = import.meta.env.VITE_API_URL + '/home';
@@ -151,6 +151,8 @@ export function HomePage() {
   return (
     <div className="container mx-auto p-4 space-y-8">
       {homeContent.map((content) => (
+        console.log(`content:`),
+        console.log(content),
         <HomeCard
           key={content.id}
           submitRef={submitRef}
@@ -160,7 +162,7 @@ export function HomePage() {
           defaultParagraph1={content.paragraph_1}
           defaultParagraph2={content.paragraph_2}
           defaultAction={content.action}
-          defaultImage={content.image ? `data:image/png;base64,${content.image}` : '/placeholder.svg'}
+          defaultImage={content.image_url || '/placeholder.svg'}
           onDelete={handleDelete}
           onReorder={handleReorder}
           onSubmit={handleSubmit}

@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/useAuth"
 interface PhoneData {
   id: string | number;
   sort_id: number;
-  image: string | null;
+  image_url: string | null;
   number: string;
 }
 
@@ -132,7 +132,7 @@ function PhonePage() {
           submitRef={submitRef}
           id={phone.id.toString()}
           sortId={phone.sort_id}
-          defaultImage={phone.image ? `data:image/png;base64,${phone.image}` : '/placeholder.svg'}
+          defaultImage={phone.image_url || '/placeholder.svg'}
           defaultNumber={phone.number}
           onDelete={handleDelete}
           onReorder={handleReorder}
