@@ -49,14 +49,14 @@ interface GameCardProps {
 const GameCard = ({ 
   id,
   // sortId,
-  defaultTitle = "New Game Title",
-  defaultDescription1 = "Enter first description here...",
-  defaultDescription2 = "Enter second description here...",
+  defaultTitle = "",
+  defaultDescription1 = "",
+  defaultDescription2 = "",
   defaultImage = "/placeholder.svg",
   defaultSmallImages = [],
   defaultBackgroundColor = "#ffffff",
   defaultTextColor = "#000000",
-  defaultUrl = "https://example.com",
+  defaultUrl = "",
   onDelete,
   onReorder,
   onSubmit,
@@ -103,10 +103,10 @@ const GameCard = ({
     try {
       await onSubmit({
         id,
-        title: title.trim() || 'New Game Title',
-        description1: description1.trim() || 'Enter first description here...',
-        description2: description2.trim() || 'Enter second description here...',
-        url: url.trim() || 'https://example.com',
+        title: title.trim() || '',
+        description1: description1.trim() || '',
+        description2: description2.trim() || '',
+        url: url.trim() || '',
         mainImage,
         smallImages,
         backgroundColor,
@@ -172,7 +172,6 @@ const GameCard = ({
 
           {/* Content Section */}
           <div className="space-y-4">
-            {isEditingTitle ? (
               <Input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -181,16 +180,7 @@ const GameCard = ({
                 onBlur={() => setIsEditingTitle(false)}
                 autoFocus
               />
-            ) : (
-              <h2 
-                className="text-2xl font-bold cursor-pointer hover:bg-gray-100 p-1 rounded"
-                onClick={() => setIsEditingTitle(true)}
-              >
-                {title || "Game Title"}
-              </h2>
-            )}
 
-            {isEditingDesc1 ? (
               <Textarea
                 value={description1}
                 onChange={(e) => setDescription1(e.target.value)}
@@ -199,16 +189,7 @@ const GameCard = ({
                 onBlur={() => setIsEditingDesc1(false)}
                 autoFocus
               />
-            ) : (
-              <p 
-                className="text-gray-600 cursor-pointer hover:bg-gray-100 p-1 rounded"
-                onClick={() => setIsEditingDesc1(true)}
-              >
-                {description1 || "First description goes here"}
-              </p>
-            )}
 
-            {isEditingDesc2 ? (
               <Textarea
                 value={description2}
                 onChange={(e) => setDescription2(e.target.value)}
@@ -217,16 +198,7 @@ const GameCard = ({
                 onBlur={() => setIsEditingDesc2(false)}
                 autoFocus
               />
-            ) : (
-              <p 
-                className="text-gray-600 cursor-pointer hover:bg-gray-100 p-1 rounded"
-                onClick={() => setIsEditingDesc2(true)}
-              >
-                {description2 || "Second description goes here"}
-              </p>
-            )}
 
-            {isEditingUrl ? (
               <Input
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
@@ -235,14 +207,6 @@ const GameCard = ({
                 onBlur={() => setIsEditingUrl(false)}
                 autoFocus
               />
-            ) : (
-              <p 
-                className="text-gray-600 cursor-pointer hover:bg-gray-100 p-1 rounded"
-                onClick={() => setIsEditingUrl(true)}
-              >
-                {url || "https://example.com"}
-              </p>
-            )}
 
             {/* Small Images Section */}
             <div className="grid grid-cols-3 gap-4 mt-4">
