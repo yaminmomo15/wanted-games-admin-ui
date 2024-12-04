@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react"
 import { ContactCard } from "@/components/cards/contact"
-import { AddButton } from "../add-button"
 import axios from 'axios'
 import { useAuth } from "@/hooks/useAuth"
 
@@ -75,22 +74,38 @@ function ContactPage() {
         }
       });
 
+      // Get current contact data for comparison
+      const currentContact = contacts.find(contact => contact.id.toString() === contactData.id);
+
       // Handle images separately
       const imagesToUpload = [
-        { id: 1, label: 'background_image', image: contactData.background_image },
-        { id: 2, label: 'logo', image: contactData.logo }
+        { 
+          label: 'background_image', 
+          newImage: contactData.background_image,
+          currentImage: currentContact?.background_image
+        },
+        { 
+          label: 'logo', 
+          newImage: contactData.logo,
+          currentImage: currentContact?.logo
+        }
       ];
       
       for (const imageData of imagesToUpload) {
-        if (!imageData || !imageData.image || imageData.image === '/placeholder.svg') {
+        // Skip if no image or it's the placeholder
+        if (!imageData.newImage || imageData.newImage === '/placeholder.svg') {
+          continue;
+        }
+
+        // Skip if image hasn't changed
+        if (imageData.newImage === imageData.currentImage) {
           continue;
         }
 
         const formData = new FormData();
         formData.append('label', imageData.label);
         
-        // If it's a URL, fetch and append the image
-        const imageBlob = await fetch(imageData.image).then(r => r.blob());
+        const imageBlob = await fetch(imageData.newImage).then(r => r.blob());
         formData.append('image', imageBlob, 'image.png');
 
         await axios({

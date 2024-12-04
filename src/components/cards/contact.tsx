@@ -16,7 +16,6 @@ interface ContactCardProps {
   defaultEmail?: string
   defaultBackgroundImage?: string
   defaultIconImage?: string
-  onDelete: (id: string) => void
   onSubmit: (data: {
     id: string
     email: string,
@@ -31,7 +30,6 @@ const ContactCard = ({
   defaultEmail = "example@email.com",
   defaultBackgroundImage = "/placeholder.svg",
   defaultIconImage = "/placeholder.svg",
-  onDelete,
   onSubmit,
   submitRef
 }: ContactCardProps) => {
@@ -202,21 +200,6 @@ const ContactCard = ({
               </TooltipTrigger>
               <TooltipContent>
                 <p>Submit</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => onDelete(id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Delete</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
