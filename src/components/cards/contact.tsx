@@ -27,7 +27,7 @@ interface ContactCardProps {
 
 const ContactCard = ({ 
   id,
-  defaultEmail = "example@email.com",
+  defaultEmail = "",
   defaultBackgroundImage = "/placeholder.svg",
   defaultIconImage = "/placeholder.svg",
   onSubmit,
@@ -65,7 +65,7 @@ const ContactCard = ({
     try {
       await onSubmit({
         id,
-        email: email.trim() || 'example@email.com',
+        email: email.trim() || '',
         background_image: backgroundImage,
         logo: iconImage
       });
@@ -117,7 +117,6 @@ const ContactCard = ({
 
           {/* Content Section */}
           <div className="space-y-4">
-            {isEditingEmail ? (
               <Input
                 type="email"
                 value={email}
@@ -127,14 +126,6 @@ const ContactCard = ({
                 onBlur={() => setIsEditingEmail(false)}
                 autoFocus
               />
-            ) : (
-              <h2 
-                className="text-xl cursor-pointer hover:bg-gray-100 p-1 rounded"
-                onClick={() => setIsEditingEmail(true)}
-              >
-                {email || "Enter email"}
-              </h2>
-            )}
 
             {/* Icon Image */}
             <TooltipProvider>

@@ -36,11 +36,11 @@ interface AboutCardProps {
 const AboutCard = ({
   id,
   sortId,
-  defaultTitle = "New About Section",
+  defaultTitle = "",
   defaultImage = "/placeholder.svg",
-  defaultParagraph1 = "Enter first paragraph here...",
-  defaultParagraph2 = "Enter second paragraph here...",
-  defaultParagraph3 = "Enter third paragraph here...",
+  defaultParagraph1 = "",
+  defaultParagraph2 = "",
+  defaultParagraph3 = "",
   onDelete,
   onReorder,
   onSubmit,
@@ -72,10 +72,10 @@ const AboutCard = ({
     try {
       await onSubmit({
         id,
-        title: title.trim() || 'New About Section',
-        paragraph1: paragraph1.trim() || 'Enter first paragraph here...',
-        paragraph2: paragraph2.trim() || 'Enter second paragraph here...',
-        paragraph3: paragraph3.trim() || 'Enter third paragraph here...',
+        title: title.trim() || '',
+        paragraph1: paragraph1.trim() || '',
+        paragraph2: paragraph2.trim() || '',
+        paragraph3: paragraph3.trim() || '',
         image,
       });
 
@@ -119,23 +119,14 @@ const AboutCard = ({
 
           {/* Content Section */}
           <div className="space-y-4">
-            {isEditingTitle ? (
-              <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Enter title"
-                className="text-2xl font-bold"
-                onBlur={() => setIsEditingTitle(false)}
-                autoFocus
-              />
-            ) : (
-              <h2 
-                className="text-2xl font-bold cursor-pointer hover:bg-gray-100 p-1 rounded"
-                onClick={() => setIsEditingTitle(true)}
-              >
-                {title}
-              </h2>
-            )}
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter title"
+              className="text-2xl font-bold"
+              onBlur={() => setIsEditingTitle(false)}
+              autoFocus
+            />
 
             {[
               { value: paragraph1, setValue: setParagraph1, isEditing: isEditingP1, setIsEditing: setIsEditingP1 },
@@ -143,7 +134,6 @@ const AboutCard = ({
               { value: paragraph3, setValue: setParagraph3, isEditing: isEditingP3, setIsEditing: setIsEditingP3 },
             ].map((paragraph, index) => (
               <div key={index}>
-                {paragraph.isEditing ? (
                   <Textarea
                     value={paragraph.value}
                     onChange={(e) => paragraph.setValue(e.target.value)}
@@ -152,14 +142,6 @@ const AboutCard = ({
                     onBlur={() => paragraph.setIsEditing(false)}
                     autoFocus
                   />
-                ) : (
-                  <p 
-                    className="text-gray-600 cursor-pointer hover:bg-gray-100 p-1 rounded"
-                    onClick={() => paragraph.setIsEditing(true)}
-                  >
-                    {paragraph.value}
-                  </p>
-                )}
               </div>
             ))}
           </div>

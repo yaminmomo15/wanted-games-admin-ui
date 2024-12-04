@@ -36,10 +36,10 @@ interface HomeCardProps {
 
 const HomeCard = ({ 
   id,
-  defaultHeader = "New Header",
-  defaultParagraph1 = "Enter first paragraph here...",
-  defaultParagraph2 = "Enter second paragraph here...",
-  defaultAction = "Click here",
+  defaultHeader = "",
+  defaultParagraph1 = "",
+  defaultParagraph2 = "",
+  defaultAction = "",
   defaultImage = "/placeholder.svg",
   onDelete,
   onReorder,
@@ -72,10 +72,10 @@ const HomeCard = ({
     try {
       await onSubmit({
         id,
-        header: header.trim() || 'New Header',
-        paragraph1: paragraph1.trim() || 'Enter first paragraph here...',
-        paragraph2: paragraph2.trim() || 'Enter second paragraph here...',
-        action: action.trim() || 'Click here',
+        header: header.trim() || '',
+        paragraph1: paragraph1.trim() || '',
+        paragraph2: paragraph2.trim() || '',
+        action: action.trim() || '',
         image
       });
 
@@ -118,76 +118,36 @@ const HomeCard = ({
 
           {/* Content Section */}
           <div className="space-y-4">
-            {isEditingHeader ? (
-              <Input
-                value={header}
-                onChange={(e) => setHeader(e.target.value)}
-                placeholder="Enter header"
-                className="text-2xl font-bold"
-                onBlur={() => setIsEditingHeader(false)}
-                autoFocus
-              />
-            ) : (
-              <h2 
-                className="text-2xl font-bold cursor-pointer hover:bg-gray-100 p-1 rounded"
-                onClick={() => setIsEditingHeader(true)}
-              >
-                {header || "Header"}
-              </h2>
-            )}
+            <Input
+              value={header}
+              onChange={(e) => setHeader(e.target.value)}
+              placeholder="Enter header"
+              className="text-2xl font-bold"
+              onBlur={() => setIsEditingHeader(false)}
+              autoFocus
+            />
 
-            {isEditingPara1 ? (
-              <Textarea
-                value={paragraph1}
-                onChange={(e) => setParagraph1(e.target.value)}
-                placeholder="Enter first paragraph"
-                className="min-h-[100px]"
-                onBlur={() => setIsEditingPara1(false)}
-                autoFocus
-              />
-            ) : (
-              <p 
-                className="text-gray-600 cursor-pointer hover:bg-gray-100 p-1 rounded"
-                onClick={() => setIsEditingPara1(true)}
-              >
-                {paragraph1 || "First paragraph goes here"}
-              </p>
-            )}
-
-            {isEditingPara2 ? (
-              <Textarea
-                value={paragraph2}
-                onChange={(e) => setParagraph2(e.target.value)}
-                placeholder="Enter second paragraph"
-                className="min-h-[100px]"
-                onBlur={() => setIsEditingPara2(false)}
-                autoFocus
-              />
-            ) : (
-              <p 
-                className="text-gray-600 cursor-pointer hover:bg-gray-100 p-1 rounded"
-                onClick={() => setIsEditingPara2(true)}
-              >
-                {paragraph2 || "Second paragraph goes here"}
-              </p>
-            )}
-
-            {isEditingAction ? (
-              <Input
-                value={action}
-                onChange={(e) => setAction(e.target.value)}
-                placeholder="Enter action text"
-                onBlur={() => setIsEditingAction(false)}
-                autoFocus
-              />
-            ) : (
-              <p 
-                className="text-blue-600 cursor-pointer hover:bg-gray-100 p-1 rounded"
-                onClick={() => setIsEditingAction(true)}
-              >
-                {action || "Action text"}
-              </p>
-            )}
+            <Textarea
+              value={paragraph1}
+              onChange={(e) => setParagraph1(e.target.value)}
+              placeholder="Enter first paragraph"
+              onBlur={() => setIsEditingPara1(false)}
+              autoFocus
+            />
+            <Textarea
+              value={paragraph2}
+              onChange={(e) => setParagraph2(e.target.value)}
+              placeholder="Enter second paragraph"
+              onBlur={() => setIsEditingPara2(false)}
+              autoFocus
+            />
+            <Input
+              value={action}
+              onChange={(e) => setAction(e.target.value)}
+              placeholder="Click here"
+              onBlur={() => setIsEditingAction(false)}
+              autoFocus
+            />
           </div>
         </div>
 

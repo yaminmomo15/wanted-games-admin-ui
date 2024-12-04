@@ -84,10 +84,10 @@ export function HomePage() {
     const newContent: HomeData = {
       id: '1000',
       sort_id: newId,
-      header: 'New Header',
-      paragraph_1: 'Enter first paragraph here...',
-      paragraph_2: 'Enter second paragraph here...',
-      action: 'Click here',
+      header: '',
+      paragraph_1: '',
+      paragraph_2: '',
+      action: '',
       image_url: null
     };
     setHomeContent([...homeContent, newContent]);
