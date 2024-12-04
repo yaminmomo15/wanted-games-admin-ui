@@ -59,7 +59,6 @@ function LoginPage() {
   const handleResetPassword = (e: React.FormEvent) => {
     e.preventDefault()
     // TODO: Implement reset password logic
-    console.log('Reset password for:', email)
   }
 
   const toggleResetPassword = () => {

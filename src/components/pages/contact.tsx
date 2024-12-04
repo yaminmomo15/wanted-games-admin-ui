@@ -120,7 +120,6 @@ function ContactPage() {
       }
 
       await fetchAllContacts();
-      console.log(`Contact updated successfully`);
     } catch (error) {
       console.error('Error submitting contact:', error);
       throw error;

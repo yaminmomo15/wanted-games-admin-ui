@@ -89,7 +89,6 @@ export function GalleryPage() {
     image: string,
   }) => {
     try {
-      console.log('submitting')
       const formData = new FormData();
 
       const currentItem = items.find(item => item.id.toString() === data.id);
@@ -97,7 +96,6 @@ export function GalleryPage() {
       const isNewItem = data.id === '1000';
 
       if ((isImageChanged || isNewItem) && data.image !== '/placeholder.svg') {
-        console.log('fetching image')
         const imageBlob = await fetch(data.image).then(r => r.blob());
         formData.append('image', imageBlob);
 
@@ -126,7 +124,6 @@ export function GalleryPage() {
       }
 
       await fetchAllItems();
-      console.log(`Gallery item updated successfully`);
     } catch (error) {
       console.error('Error submitting gallery item:', error);
       throw error;

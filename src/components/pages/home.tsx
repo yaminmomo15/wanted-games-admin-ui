@@ -115,7 +115,6 @@ export function HomePage() {
       if ((isImageChanged || isNewContent) && contentData.image !== '/placeholder.svg') {
         const imageBlob = await fetch(contentData.image).then(r => r.blob());
         formData.append('image', imageBlob, 'image.png');
-        console.log(imageBlob)
       }
       
       if (contentData.id === '1000') {
@@ -141,7 +140,6 @@ export function HomePage() {
       }
 
       await fetchAllContent();
-      console.log(`Content updated successfully`);
     } catch (error) {
       console.error('Error submitting content:', error);
       throw error;
@@ -151,8 +149,6 @@ export function HomePage() {
   return (
     <div className="container mx-auto p-4 space-y-8">
       {homeContent.map((content) => (
-        console.log(`content:`),
-        console.log(content),
         <HomeCard
           key={content.id}
           submitRef={submitRef}

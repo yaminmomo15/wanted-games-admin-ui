@@ -67,7 +67,6 @@ const GameCard = ({
   const [description2, setDescription2] = useState(defaultDescription2)
   const [url, setUrl] = useState(defaultUrl)
   const [mainImage, setMainImage] = useState<string>(defaultImage)
-  console.log(defaultImage)
   const [smallImages, setSmallImages] = useState<string[]>(
     defaultSmallImages.length > 0 
       ? defaultSmallImages 

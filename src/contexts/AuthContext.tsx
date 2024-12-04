@@ -29,7 +29,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('auth_token', token);
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     setToken(token);
-	console.log('login', token)
     setIsAuthenticated(true);
   };
 
@@ -58,7 +57,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setIsAuthenticated(true);
     } catch (error) {
-	  console.log(error);
       setIsAuthenticated(false);
       localStorage.removeItem('token'); // Clear invalid token
     }

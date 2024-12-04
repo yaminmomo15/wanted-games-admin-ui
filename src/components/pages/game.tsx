@@ -44,7 +44,6 @@ function GamePage() {
   const fetchAllGames = async () => {
     try {
       const response = await axios.get<GameData[]>(API_URL);
-      console.log(response.data)
       setGames(response.data);
     } catch (error) {
       console.error('Error fetching games:', error);
@@ -156,7 +155,6 @@ function GamePage() {
           formData.append(`image_${i + 1}`, smallImageBlob, `image_${i + 1}.png`);
         }
       }
-
       if (gameData.id === '1000') {
         await axios({
           method: 'post',
@@ -180,8 +178,6 @@ function GamePage() {
         });
         await fetchAllGames();
       }
-  
-      console.log(`Game updated successfully`);
     } catch (error) {
       console.error('Error submitting game:', error);
       throw error;
