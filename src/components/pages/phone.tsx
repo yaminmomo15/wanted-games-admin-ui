@@ -76,7 +76,7 @@ function PhonePage() {
     const newPhone: PhoneData = {
       id: '1000',
       sort_id: phones.length + 1,
-      image: null,
+      image_url: null,
       number: ''
     };
     setPhones([...phones, newPhone]);
@@ -91,14 +91,13 @@ function PhonePage() {
       const formData = new FormData();
       formData.append('number', data.number);
 
-      if (data.image && data.image !== '/placeholder.svg') {
-        if (data.image.startsWith('data:image/png;base64,')) {
-          const imageBlob = DataURIToBlob(data.image);
-          formData.append('image', imageBlob, 'image.png');
-        } else {
+      const currentPhone = phones.find(phone => phone.id.toString() === data.id);
+      const isImageChanged = currentPhone && data.image !== currentPhone.image_url;
+      const isNewPhone = data.id === '1000';
+
+      if ((isImageChanged || isNewPhone) && data.image !== '/placeholder.svg') {
           const imageBlob = await fetch(data.image).then(r => r.blob());
           formData.append('image', imageBlob, 'image.png');
-        }
       }
 
       if (data.id === '1000') {

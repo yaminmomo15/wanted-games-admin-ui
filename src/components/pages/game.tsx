@@ -138,18 +138,25 @@ function GamePage() {
       formData.append('background_color', gameData.backgroundColor);
       formData.append('text_color', gameData.textColor);
 
-      if (gameData.mainImage && gameData.mainImage !== '/placeholder.svg') {
+      const currentGame = games.find(game => game.id.toString() === gameData.id);
+      const isMainImageChanged = currentGame && gameData.mainImage !== currentGame.image_main_url;
+      const isNewGame = gameData.id === '1000';
+
+      if ((isMainImageChanged || isNewGame) && gameData.mainImage !== '/placeholder.svg') {
         const mainImageBlob = await fetch(gameData.mainImage).then(r => r.blob());
         formData.append('image_main', mainImageBlob, 'image_main.png');
       }
 
+      // Handle small images
+      const smallImageUrls = [currentGame?.image_1_url, currentGame?.image_2_url, currentGame?.image_3_url];
       for (let i = 0; i < gameData.smallImages.length; i++) {
-        if (gameData.smallImages[i] && gameData.smallImages[i] !== '/placeholder.svg') {
+        const isSmallImageChanged = currentGame && gameData.smallImages[i] !== smallImageUrls[i];
+        if ((isSmallImageChanged || isNewGame) && gameData.smallImages[i] !== '/placeholder.svg') {
           const smallImageBlob = await fetch(gameData.smallImages[i]).then(r => r.blob());
           formData.append(`image_${i + 1}`, smallImageBlob, `image_${i + 1}.png`);
         }
       }
-      
+
       if (gameData.id === '1000') {
         await axios({
           method: 'post',

@@ -76,7 +76,7 @@ function SocialPage() {
     const newSocial: SocialData = {
       id: '1000',
       sort_id: socials.length + 1,
-      image: null,
+      image_url: null,
       url: 'https://'
     };
     setSocials([...socials, newSocial]);
@@ -91,14 +91,13 @@ function SocialPage() {
       const formData = new FormData();
       formData.append('url', data.url);
 
-      if (data.image && data.image !== '/placeholder.svg') {
-        if (data.image.startsWith('data:image/png;base64,')) {
-          const imageBlob = DataURIToBlob(data.image);
-          formData.append('image', imageBlob, 'image.png');
-        } else {
-          const imageBlob = await fetch(data.image).then(r => r.blob());
-          formData.append('image', imageBlob, 'image.png');
-        }
+      const currentSocial = socials.find(social => social.id.toString() === data.id);
+      const isImageChanged = currentSocial && data.image !== currentSocial.image_url;
+      const isNewSocial = data.id === '1000';
+
+      if ((isImageChanged || isNewSocial) && data.image !== '/placeholder.svg') {
+        const imageBlob = await fetch(data.image).then(r => r.blob());
+        formData.append('image', imageBlob, 'image.png');
       }
 
       if (data.id === '1000') {

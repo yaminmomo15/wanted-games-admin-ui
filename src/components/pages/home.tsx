@@ -88,7 +88,7 @@ export function HomePage() {
       paragraph_1: 'Enter first paragraph here...',
       paragraph_2: 'Enter second paragraph here...',
       action: 'Click here',
-      image: null
+      image_url: null
     };
     setHomeContent([...homeContent, newContent]);
   };
@@ -108,14 +108,14 @@ export function HomePage() {
       formData.append('paragraph_2', contentData.paragraph2);
       formData.append('action', contentData.action);
 
-      if (contentData.image && contentData.image !== '/placeholder.svg') {
-        if (contentData.image.startsWith('data:image/png;base64,')) {
-          const imageBlob = DataURIToBlob(contentData.image);
-          formData.append('image', imageBlob, 'image.png');
-        } else {
-          const imageBlob = await fetch(contentData.image).then(r => r.blob());
-          formData.append('image', imageBlob, 'image.png');
-        }
+      const currentContent = homeContent.find(content => content.id.toString() === contentData.id);
+      const isImageChanged = currentContent && contentData.image !== currentContent.image_url;
+      const isNewContent = contentData.id === '1000';
+      
+      if ((isImageChanged || isNewContent) && contentData.image !== '/placeholder.svg') {
+        const imageBlob = await fetch(contentData.image).then(r => r.blob());
+        formData.append('image', imageBlob, 'image.png');
+        console.log(imageBlob)
       }
       
       if (contentData.id === '1000') {

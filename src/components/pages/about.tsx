@@ -88,7 +88,7 @@ function AboutPage() {
       paragraph_1: 'Enter first paragraph here...',
       paragraph_2: 'Enter second paragraph here...',
       paragraph_3: 'Enter third paragraph here...',
-      image: null
+      image_url: null
     }
     setAboutSections([...aboutSections, newSection])
   }
@@ -108,14 +108,13 @@ function AboutPage() {
       formData.append('paragraph_2', sectionData.paragraph2)
       formData.append('paragraph_3', sectionData.paragraph3)
 
-      if (sectionData.image && sectionData.image !== '/placeholder.svg') {
-        if (sectionData.image.startsWith('data:image/png;base64,')) {
-          const imageBlob = DataURIToBlob(sectionData.image)
-          formData.append('image', imageBlob, 'image.png')
-        } else {
-          const imageBlob = await fetch(sectionData.image).then(r => r.blob())
-          formData.append('image', imageBlob, 'image.png')
-        }
+      const currentSection = aboutSections.find(section => section.id.toString() === sectionData.id);
+      const isImageChanged = currentSection && sectionData.image !== currentSection.image_url;
+      const isNewSection = sectionData.id === '1000';
+
+      if ((isImageChanged || isNewSection) && sectionData.image !== '/placeholder.svg') {
+        const imageBlob = await fetch(sectionData.image).then(r => r.blob())
+        formData.append('image', imageBlob, 'image.png')
       }
 
       if (sectionData.id === '1000') {
