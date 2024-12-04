@@ -17,7 +17,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { Send, ArrowUpDown, Trash2, ImageIcon, Pencil, Check } from 'lucide-react'
+import { Send, ArrowUpDown, Trash2, ImageIcon, Check } from 'lucide-react'
 
 interface GameCardProps {
   id: string

@@ -25,6 +25,12 @@ function LoginPage() {
     e.preventDefault()
     setState({}) // Reset state before new attempt
     
+    // check if username is valid number, letter, or dash using regex
+    const usernameRegex = /^[a-zA-Z0-9-_]+$/;
+    if (!usernameRegex.test(username)) {
+      setState({ message: 'Invalid username', errors: { username: 'Invalid username' } })
+      return
+    }
     try {
       const response = await axios({
         method: 'post',
