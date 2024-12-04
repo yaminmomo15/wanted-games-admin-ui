@@ -199,26 +199,6 @@ const HomeCard = ({
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => {
-                    setIsEditingHeader(true)
-                    setIsEditingPara1(true)
-                    setIsEditingPara2(true)
-                    setIsEditingAction(true)
-                  }}
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Edit</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
                   onClick={() => submitRef.current?.()}
                 >
                   {isSubmitted ? (

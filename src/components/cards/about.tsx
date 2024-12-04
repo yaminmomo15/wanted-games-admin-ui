@@ -173,26 +173,6 @@ const AboutCard = ({
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => {
-                    setIsEditingTitle(true)
-                    setIsEditingP1(true)
-                    setIsEditingP2(true)
-                    setIsEditingP3(true)
-                  }}
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Edit</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
                   onClick={() => submitRef.current?.()}
                 >
                   {isSubmitted ? (
