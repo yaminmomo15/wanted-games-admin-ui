@@ -18,7 +18,7 @@ export function GalleryPage() {
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [isReorderModalOpen, setIsReorderModalOpen] = useState(false);
   const submitRef = useRef<(() => void) | null>(null);
-  
+
   const fetchAllItems = async () => {
     try {
       const response = await axios.get<GalleryItem[]>(API_URL);
@@ -71,7 +71,7 @@ export function GalleryPage() {
   };
 
   const handleAddImage = () => {
-    const lastId = items.length > 0 
+    const lastId = items.length > 0
       ? parseInt(items[items.length - 1].id.toString())
       : 0;
     const newId = (lastId + 1);
@@ -89,35 +89,43 @@ export function GalleryPage() {
     image: string,
   }) => {
     try {
+      console.log('submitting')
       const formData = new FormData();
 
-      if (data.image && data.image !== '/placeholder.svg') {
+      const currentItem = items.find(item => item.id.toString() === data.id);
+      const isImageChanged = currentItem && data.image !== currentItem.image_url;
+      const isNewItem = data.id === '1000';
+
+      if ((isImageChanged || isNewItem) && data.image !== '/placeholder.svg') {
+        console.log('fetching image')
         const imageBlob = await fetch(data.image).then(r => r.blob());
         formData.append('image', imageBlob);
-      }
-      
-      if (data.id === '1000') {
-        await axios({
-          method: 'post',
-          url: API_URL,
-          data: formData,
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-      } else {
-        await axios({
-          method: 'put',
-          url: `${API_URL}/${data.id}`,
-          data: formData,
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-          }
-        });
+
+
+        if (data.id === '1000') {
+          await axios({
+            method: 'post',
+            url: API_URL,
+            data: formData,
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+        } else {
+          await axios({
+            method: 'put',
+            url: `${API_URL}/${data.id}`,
+            data: formData,
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+        }
       }
 
+      await fetchAllItems();
       console.log(`Gallery item updated successfully`);
     } catch (error) {
       console.error('Error submitting gallery item:', error);
@@ -144,10 +152,10 @@ export function GalleryPage() {
       <ReorderModal
         isOpen={isReorderModalOpen}
         onClose={() => setIsReorderModalOpen(false)}
-        cards={items.map(item => ({ 
-          id: item.id.toString(), 
-          sort_id: item.sort_id, 
-          title: `Image ${item.id}` 
+        cards={items.map(item => ({
+          id: item.id.toString(),
+          sort_id: item.sort_id,
+          title: `Image ${item.id}`
         }))}
         onSave={handleSaveReorder}
       />
